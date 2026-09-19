@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English 4 Reviewer — Flashcards &amp; Quiz</title>
+<style>
+  :root{
+    --bg:#0d1024;
+    --bg2:#161a38;
+    --surface:#1c2144;
+    --surface2:#252b55;
+    --line:#333a6b;
+    --text:#e9ebf8;
+    --muted:#9aa3c9;
+    --accent:#f5b731;
+    --accent2:#7c5cff;
+    --correct:#2ecc71;
+    --wrong:#ff5c5c;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:radial-gradient(1200px 700px at 15% -10%, #2a2160 0%, transparent 55%),
+               radial-gradient(1000px 600px at 90% 0%, #123a5c 0%, transparent 50%),
+               var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    padding:22px 16px 60px;
+    line-height:1.55;
+  }
+  .app{max-width:900px;margin:0 auto;}
+
+  header{text-align:center;margin-bottom:24px;}
+  header h1{
+    font-size:clamp(1.5rem,4.5vw,2.2rem);
+    letter-spacing:-.5px;
+    background:linear-gradient(90deg,var(--accent),#ffd97a,var(--accent2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    font-weight:800;
+  }
+  header p{color:var(--muted);font-size:.85rem;margin-top:6px;}
+
+  .tabs{display:flex;gap:10px;justify-content:center;margin-bottom:26px;flex-wrap:wrap;}
+  .tabs button{
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--muted);
+    padding:11px 26px;
+    border-radius:999px;
+    font-size:.95rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:.22s;
+  }
+  .tabs button:hover{color:var(--text);border-color:var(--accent2);}
+  .tabs button.active{
+    background:linear-gradient(135deg,var(--accent2),#5a3fd6);
+    color:#fff;border-color:transparent;
+    box-shadow:0 6px 20px -6px var(--accent2);
+  }
+
+  .panel{display:none;animation:fade .3s ease;}
+  .panel.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+  /* ---------- DECK BAR ---------- */
+  .deck-bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;}
+  .deck-bar button{
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--muted);
+    padding:7px 15px;
+    border-radius:999px;
+    font-size:.78rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s;
+  }
+  .deck-bar button:hover{color:var(--text);}
+  .deck-bar button.active{
+    background:var(--accent);
+    color:#221a00;
+    border-color:var(--accent);
+  }
+
+  /* ---------- FLASHCARD ---------- */
+  .card{
+    perspective:1400px;
+    height:400px;
+    cursor:pointer;
+    margin-bottom:18px;
+  }
+  .card-inner{
+    position:relative;width:100%;height:100%;
+    transition:transform .62s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+  }
+  .card.flipped .card-inner{transform:rotateY(180deg);}
+  .card-face{
+    position:absolute;inset:0;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    border-radius:var(--radius);
+    display:flex;align-items:center;justify-content:center;
+    padding:30px 26px;
+    overflow-y:auto;
+    border:1px solid var(--line);
+    box-shadow:0 18px 45px -20px #000;
+  }
+  .card-front{
+    background:linear-gradient(160deg,var(--surface2),var(--surface));
+  }
+  .card-back{
+    background:linear-gradient(160deg,#20315a,#1a2447);
+    transform:rotateY(180deg);
+    border-color:#3c5a99;
+  }
+  .card-face > div{max-width:100%;}
+  .card-label{
+    display:block;
+    font-size:.7rem;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:700;
+    margin-bottom:12px;
+    text-align:center;
+  }
+  .card-back .card-label{color:#7fd3ff;}
+  .card-face p{
+    font-size:clamp(1rem,2.5vw,1.18rem);
+    text-align:center;
+    font-weight:500;
+  }
+  .card-hint{
+    text-align:center;color:var(--muted);font-size:.75rem;
+    margin-top:8px;margin-bottom:14px;
+  }
+
+  .fc-controls{
+    display:flex;align-items:center;justify-content:center;gap:14px;
+    flex-wrap:wrap;
+  }
+  .fc-controls button{
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--text);
+    padding:10px 20px;
+    border-radius:12px;
+    font-size:.85rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s;
+  }
+  .fc-controls button:hover{background:var(--surface2);border-color:var(--accent2);}
+  .fc-controls button:disabled{opacity:.35;cursor:not-allowed;}
+  #fcCounter{
+    font-size:.85rem;color:var(--muted);font-weight:700;
+    min-width:78px;text-align:center;
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* ---------- QUIZ ---------- */
+  .quiz-top{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:12px;font-size:.82rem;color:var(--muted);font-weight:600;
+  }
+  .bar{height:7px;background:var(--surface);border-radius:99px;overflow:hidden;margin-bottom:22px;}
+  .bar-fill{
+    height:100%;width:0%;
+    background:linear-gradient(90deg,var(--accent2),var(--accent));
+    border-radius:99px;transition:width .35s ease;
+  }
+  .q-box{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:26px 24px;
+    margin-bottom:18px;
+  }
+  .q-tag{
+    display:inline-block;
+    font-size:.66rem;letter-spacing:1.6px;text-transform:uppercase;
+    color:var(--accent);font-weight:700;
+    background:#f5b7311a;
+    padding:4px 11px;border-radius:99px;margin-bottom:14px;
+  }
+  .q-text{font-size:1.05rem;font-weight:600;line-height:1.6;}
+  .opts{display:flex;flex-direction:column;gap:10px;}
+  .opt{
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--text);
+    padding:14px 18px;
+    border-radius:12px;
+    font-size:.92rem;
+    text-align:left;
+    cursor:pointer;
+    transition:.18s;
+    font-family:inherit;
+    line-height:1.5;
+    display:flex;gap:12px;align-items:flex-start;
+  }
+  .opt:hover:not(.locked){background:var(--surface2);border-color:var(--accent2);transform:translateX(3px);}
+  .opt .letter{
+    font-weight:800;color:var(--accent);flex-shrink:0;min-width:18px;
+  }
+  .opt.correct{background:#1e5c3a;border-color:var(--correct);}
+  .opt.correct .letter{color:#8affc1;}
+  .opt.wrong{background:#5c1e1e;border-color:var(--wrong);}
+  .opt.wrong .letter{color:#ffb3b3;}
+  .opt.locked{cursor:default;}
+
+  .explain{
+    margin-top:16px;
+    background:#0e1330;
+    border-left:3px solid var(--accent);
+    padding:13px 16px;
+    border-radius:0 10px 10px 0;
+    font-size:.87rem;
+    color:#c3caea;
+    display:none;
+  }
+  .explain.show{display:block;animation:fade .25s ease;}
+  .explain strong{color:var(--accent);}
+
+  #nextQ{
+    display:none;
+    margin-top:18px;
+    width:100%;
+    background:linear-gradient(135deg,var(--accent2),#5a3fd6);
+    border:none;color:#fff;
+    padding:14px;border-radius:12px;
+    font-size:.95rem;font-weight:700;
+    cursor:pointer;font-family:inherit;
+    transition:.2s;
+  }
+  #nextQ:hover{filter:brightness(1.15);}
+  #nextQ.show{display:block;}
+
+  /* ---------- RESULTS ---------- */
+  .result{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:40px 26px;
+    text-align:center;
+    display:none;
+  }
+  .result.show{display:block;animation:fade .4s ease;}
+  .score-ring{
+    font-size:3.4rem;font-weight:800;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    line-height:1.1;
+  }
+  .result h2{margin:10px 0 6px;font-size:1.3rem;}
+  .result p{color:var(--muted);font-size:.9rem;margin-bottom:8px;}
+  .result .msg{
+    font-size:1rem;margin:18px 0 26px;color:var(--text);font-weight:600;
+  }
+  .result button{
+    background:linear-gradient(135deg,var(--accent2),#5a3fd6);
+    border:none;color:#fff;
+    padding:13px 32px;border-radius:12px;
+    font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;
+    transition:.2s;
+  }
+  .result button:hover{filter:brightness(1.15);}
+
+  @media(max-width:600px){
+    .card{height:340px;}
+    .card-face{padding:22px 18px;}
+    .q-box{padding:20px 16px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>English 4 Reviewer</h1>
+    <p>Literature · Mythology · Gilgamesh · Book of Job · Oedipus Rex · Business Writing</p>
+  </header>
+
+  <nav class="tabs">
+    <button data-tab="flash" class="active">📇 Flashcards</button>
+    <button data-tab="quiz">📝 Quiz</button>
+  </nav>
+
+  <!-- ============ FLASHCARDS ============ -->
+  <section id="flash" class="panel active">
+    <div class="deck-bar" id="deckBar"></div>
+    <div class="card" id="card">
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div>
+            <span class="card-label">Question</span>
+            <p id="fcQ">Loading…</p>
+          </div>
+        </div>
+        <div class="card-face card-back">
+          <div>
+            <span class="card-label">Answer</span>
+            <p id="fcA"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="card-hint">Click the card to flip · Use ← → keys to navigate</p>
+    <div class="fc-controls">
+      <button id="prevBtn">← Prev</button>
+      <span id="fcCounter">1 / 1</span>
+      <button id="nextBtn">Next →</button>
+      <button id="shuffleBtn">🔀 Shuffle</button>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="quiz" class="panel">
+    <div id="quizArea">
+      <div class="quiz-top">
+        <span id="qProgress">Question 1 of 45</span>
+        <span id="qScore">Score: 0</span>
+      </div>
+      <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+      <div class="q-box">
+        <span class="q-tag" id="qTag">Topic</span>
+        <p class="q-text" id="qText"></p>
+      </div>
+      <div class="opts" id="opts"></div>
+      <div class="explain" id="explain"></div>
+      <button id="nextQ">Next Question →</button>
+    </div>
+
+    <div class="result" id="result">
+      <div class="score-ring" id="scoreRing">0%</div>
+      <h2 id="resultTitle">Quiz Complete!</h2>
+      <p id="resultSub"></p>
+      <p class="msg" id="resultMsg"></p>
+      <button id="retryBtn">🔄 Retake Quiz</button>
+    </div>
+  </section>
+</div>
+
+<script>
+/* =========================================================
+   FLASHCARD DECKS
+   ========================================================= */
+const DECKS = {
+  "Lit Basics": [
+    {q:"Where does the word 'literature' come from?", a:"Latin littera, meaning 'letter.'"},
+    {q:"What are the five forms of literature?", a:"Poetry, Drama, Prose, Oral Literature, and Media."},
+    {q:"Which literary form is considered the oldest?", a:"Poetry — it existed through songs and spoken narratives before writing."},
+    {q:"Novel vs. Short Story?", a:"Novel — longer, tackles complicated plots and storylines, often in chapters. Short Story — a single plot, all attention devoted to resolving it."},
+    {q:"What is a memoir?", a:"A focused account of a specific aspect or period of a real person's life — a shorter, more focused biography."},
+    {q:"What is an autobiography?", a:"A self-written life story."},
+    {q:"What is a biography?", a:"A complete retelling of a person's life from birth to death."},
+    {q:"Haiku structure and theme?", a:"Originally Japanese; three lines with a 5-7-5 syllable count; usually about nature and simple pleasures."},
+    {q:"What is a sonnet?", a:"14 lines in iambic pentameter; from Italian meaning 'little sound or song'; Shakespeare's most-used form."},
+    {q:"What is an epic?", a:"A long narrative poem detailing the adventures of a hero."},
+    {q:"What is a ballad?", a:"A slow love song meant to be sung; typically 4–6 lines per stanza with a definite rhyming pattern."},
+    {q:"What is a cinquain?", a:"A five-line poem that conveys a vivid image."},
+    {q:"What is a lyric poem?", a:"Often accompanied by music; expresses one's feelings and does not necessarily include a narrative."},
+    {q:"Fable vs. Myth?", a:"Fable — features personified animals as characters. Myth — about gods, goddesses, and supernatural characters with magical/fantastical elements."},
+    {q:"What are the five types of essay?", a:"Narrative, Descriptive, Expository, Critical, and Persuasive."},
+    {q:"Which form is unique because of how it is delivered?", a:"Oral Literature — it uses poetry's structure but its performative aspect makes it distinct."}
+  ],
+
+  "Mythology": [
+    {q:"What does 'myth' mean?", a:"From Greek mythos = 'story' or 'tale'; an ancient narrative explaining natural events, origins, or practices."},
+    {q:"What are the three types of myths?", a:"Etiological, Historical, and Psychological."},
+    {q:"What is an etiological myth?", a:"One that explains the origin of a place, object, or concept — from the Greek word for 'reason.'"},
+    {q:"Who said 'Myths teach meaning'?", a:"Joseph Campbell, American professor of literature."},
+    {q:"Who wrote Theogony and when?", a:"Hesiod, around 700 BC — the first written cosmogony in Greek mythology."},
+    {q:"What are the four primordial beings?", a:"Chaos (the gap), Gaea (earth), Tartarus (abyss), and Eros (love)."},
+    {q:"Who were Cronus and Rhea's children?", a:"Hestia, Demeter, Hera, Hades, Poseidon, and Zeus."},
+    {q:"How was Aphrodite born?", a:"From the sea after Cronus castrated Uranus and threw the severed part into the ocean."},
+    {q:"How was Athena born?", a:"Zeus swallowed Metis; Athena emerged fully grown and dressed for war from Zeus' forehead."},
+    {q:"What was the Titanomachy?", a:"The war between the Titans (led by Atlas) and the gods (led by Zeus). Zeus won."},
+    {q:"What did Prometheus do, and what was his punishment?", a:"He gave fire to mankind (meant only for gods); he was chained to a mountain for a vulture to peck out his liver daily."},
+    {q:"What did Pandora release from the box?", a:"All evils — pain, sickness, envy, greed, and other horrors — but also hope."},
+    {q:"What is Zeus' identity and symbols?", a:"King of all gods; symbols: eagle, lightning, thunderbolt, and scepter."},
+    {q:"What is Poseidon's identity and symbols?", a:"God of the sea, floods, drought, and horses; symbols: trident, horses, dolphins."},
+    {q:"What is Athena's identity and symbols?", a:"Goddess of wisdom, warfare, and handicrafts; symbols: olive tree, owl, spear, shield."},
+    {q:"What is Aphrodite's identity and symbols?", a:"Goddess of love and beauty; symbols: myrtle wreath, apple, scallop shell, dove."},
+    {q:"What were the three categories of Ancient Greek mythology?", a:"Religious myths, Legends or sagas, and Folktales."},
+    {q:"Who were the three great tragic playwrights of Athens?", a:"Aeschylus, Sophocles, and Euripides."}
+  ],
+
+  "Archetypes": [
+    {q:"What is an archetype?", a:"A story element meant to inject something universally human into the reading, viewing, or listening experience."},
+    {q:"Who introduced the 'collective unconscious'?", a:"Psychologist Carl Jung."},
+    {q:"What are the five common character archetypes?", a:"The Hero, The Villain, The Antihero, The Everyman, and The Trickster/Jester."},
+    {q:"Describe the Hero archetype.", a:"Comes from ordinary life but is called to adventure; confronts their darkest fear in order to transform and overcome conflict."},
+    {q:"Describe the Villain archetype.", a:"Known for being evil; motivations become clear (fear or pursuit of power); their main vice parallels the hero's main virtue."},
+    {q:"Describe the Antihero.", a:"Has heroic attributes but is not as conventionally 'good' as a hero — e.g., Wolverine."},
+    {q:"Describe the Everyman.", a:"A normal person facing extraordinary circumstances; does not feel obligated to save the world — simply wants to survive."},
+    {q:"Describe the Trickster/Jester.", a:"Flexible; can be good or evil; breaks society's (even nature's) rules and laughs at terrifying things — e.g., Bugs Bunny."},
+    {q:"What are the five situational archetypes?", a:"Journeys, Good vs. Evil, Natural vs. Mechanistic World, Death and Rebirth, and Rags to Riches."},
+    {q:"Give an example of Death and Rebirth.", a:"The Lion King — a cub's baptism, an adult lion's death, and the cub growing up to take over leadership."},
+    {q:"Give an example of Rags to Riches.", a:"The Princess Diaries — a nerdy schoolgirl transforms into a long-lost princess."},
+    {q:"Give an example of Natural vs. Mechanistic World.", a:"Wall-E — an emotionally intelligent robot compacts garbage while humanity waits in a spaceship."},
+    {q:"What archetypal elements are commonly used?", a:"Unique births, mysteries, extraordinary powers, tragic flaws, rites of passage, and nemeses."}
+  ],
+
+  "Gilgamesh": [
+    {q:"Who was Gilgamesh?", a:"King of Uruk who ruled around 2700 BC; the epic is based on the legendary adventures attributed to him."},
+    {q:"What is the earliest surviving great work of literature?", a:"The Epic of Gilgamesh — an ancient Mesopotamian odyssey."},
+    {q:"Who rediscovered the complete version, and when?", a:"British archaeologist Austen Layard in 1839, in Nineveh (the library of Ashurbanipal)."},
+    {q:"Who wrote the Akkadian version?", a:"Babylonian writer Shin-Leqi-Unninni (1300–1000 BCE)."},
+    {q:"What is the oldest existing version of the epic?", a:"The one dating back to 2000 BC in Sumerian cuneiform."},
+    {q:"Who was Enkidu?", a:"A hairy wild man created by the gods to challenge Gilgamesh; he became Gilgamesh's closest friend."},
+    {q:"Who was Humbaba?", a:"The monster in the Cedar Forest whom Gilgamesh and Enkidu fight."},
+    {q:"Who was Utnapishtim?", a:"The flood hero granted immortality by the gods; he tells Gilgamesh the secrets of the gods."},
+    {q:"Who was Urshanabi?", a:"The boatman who leads Gilgamesh to Uruk at the end of the epic."},
+    {q:"What two secrets did Utnapishtim reveal?", a:"1) The gods planned to destroy humanity by a flood. 2) The secret of immortality, which was granted to Utnapishtim."},
+    {q:"What did Gilgamesh learn about eternal life?", a:"That true immortality is not living forever — it is the lasting legacy of one's works (like the walls of Uruk)."},
+    {q:"How is Gilgamesh described at the start of the epic?", a:"Tyrannical, cruel, and arrogant."},
+    {q:"Why did the gods allow Enkidu to challenge Gilgamesh?", a:"Because Gilgamesh abused the people of Uruk."},
+    {q:"What happened after Enkidu's death?", a:"Gilgamesh grieved deeply and resolved to discover the secret of immortality."},
+    {q:"How does the Gilgamesh flood compare to Noah's flood?", a:"Both feature a divine decision to flood the world, a chosen survivor, a boat, birds sent out to find land, a sacrifice, and gods who regret the destruction."},
+    {q:"What city did Gilgamesh rule?", a:"Uruk."},
+    {q:"What does the Gilgamesh story teach about life?", a:"Our lives are defined not just by ourselves or the gods, but also by the people we meet along the way."}
+  ],
+
+  "Book of Job": [
+    {q:"Who wrote the Book of Job?", a:"An anonymous non-Israelite from the land of Uz, southeast of ancient Israel."},
+    {q:"Where is the Book of Job located in the biblical canon?", a:"In the Ketuvim ('writings'), the third section of the biblical canon."},
+    {q:"How does God describe Job?", a:"Blameless and upright, one who fears God and turns away from evil — 'there is none like him on the earth.'"},
+    {q:"How many children did Job originally have?", a:"Seven sons and three daughters."},
+    {q:"What was Job's initial wealth?", a:"7,000 sheep, 3,000 camels, 500 yoke of oxen, 500 female donkeys, and a very large household."},
+    {q:"What title did Job hold among the people of the East?", a:"He was 'the greatest man among all the people of the East.'"},
+    {q:"Who challenged Job's faith in heaven?", a:"Satan (the accuser), who appeared among the 'sons of God.'"},
+    {q:"What was the wager between God and Satan?", a:"Satan claimed Job only feared God because of blessings; God permitted Satan to test Job but forbade taking his life."},
+    {q:"What were the four calamities that struck Job?", a:"1) Sabeans stole his oxen and donkeys. 2) Fire from heaven burned his sheep. 3) Chaldeans stole his camels. 4) A great wind collapsed the house, killing all ten children."},
+    {q:"How did Job respond to the first calamities?", a:"He tore his robe, shaved his head, fell to the ground and worshipped: 'The Lord gave, and the Lord has taken away; blessed be the name of the Lord.'"},
+    {q:"How did Satan torment Job's body?", a:"With severe boils from the soles of his feet to the crown of his head."},
+    {q:"What did Job's wife tell him?", a:"'Do you still hold fast to your integrity? Curse God and die!'"},
+    {q:"How did Job answer his wife?", a:"'You speak as one of the foolish women would speak. Shall we receive good from God, and shall we not receive evil?' — In all this Job did not sin with his lips."},
+    {q:"Who were Job's three friends?", a:"Eliphaz the Temanite, Bildad the Shuhite, and Zophar the Naamathite."},
+    {q:"How long did Job's friends sit with him in silence?", a:"Seven days and seven nights, because they saw his suffering was very great."},
+    {q:"What did Bildad compare Job's children to?", a:"Death."},
+    {q:"What did Job call his friends?", a:"'Miserable comforters.'"},
+    {q:"How did God speak to Job?", a:"Through a whirlwind."},
+    {q:"What key statement does Job make in Job 42:2?", a:"'I know that you can do all things, and that no purpose of yours can be thwarted.'"},
+    {q:"When did God restore Job's fortunes?", a:"After Job prayed for his friends."},
+    {q:"What was Job's wealth after restoration?", a:"14,000 sheep, 6,000 camels, 1,000 yoke of oxen, and 1,000 female donkeys — double his original wealth."},
+    {q:"What were the names of Job's daughters after his restoration?", a:"Jemimah, Keziah, and Keren-Happuch — the most beautiful women in all the land."},
+    {q:"What unusual thing did Job do for his daughters?", a:"He gave them an inheritance along with their brothers."},
+    {q:"How long did Job live after his restoration?", a:"140 more years; he saw four generations of descendants and died old and full of days."},
+    {q:"Who did God rebuke at the end of the book?", a:"Job's three friends — they had defended God but spoken falsely about Him."},
+    {q:"What is the main theme of the Book of Job?", a:"Theodicy — why good people suffer; faith and steadfastness in the midst of suffering."},
+    {q:"What did Job value more than anything else?", a:"The word of God."},
+    {q:"What is the main idea about living in the midst of struggles?", a:"Never lose faith in your ability to overcome it."}
+  ],
+
+  "Oedipus Rex": [
+    {q:"Who wrote Oedipus Rex?", a:"Sophocles (c. 496–406 BCE), one of classical Athens' three great tragic playwrights."},
+    {q:"What does the name 'Oedipus' mean?", a:"'Swollen foot.'"},
+    {q:"What is the Latin title, and what does Tyrannos mean?", a:"Oedipus Tyrannos — 'Tyrannos' signifies the throne was not gained through inheritance."},
+    {q:"When and where was Oedipus Rex performed?", a:"5th century BCE; first runner-up in 429 BC at the festival of Dionysus in Athens, Greece."},
+    {q:"What is the cause of the plague in Thebes?", a:"The undiscovered murderer of the old king, Laius, who must be exiled."},
+    {q:"Where was Oedipus left for dead as a baby?", a:"On Mount Cithaeon."},
+    {q:"Who reveals the truth to Oedipus?", a:"Tiresias, the blind prophet — he knows the true nature of Oedipus."},
+    {q:"Why does Jocasta try to stop Oedipus from speaking to the shepherd?", a:"Because she already knew the truth and knew Oedipus would be destroyed."},
+    {q:"What punishment does Oedipus receive?", a:"He blinds himself and exiles himself."},
+    {q:"Who becomes ruler of Thebes at the end?", a:"Creon, Jocasta's brother."},
+    {q:"How does Jocasta die?", a:"She hangs herself."},
+    {q:"What is Oedipus' tragic flaw?", a:"Arrogance (also described as impulsiveness)."},
+    {q:"What is hamartia?", a:"The hero's flaw that leads to his tragic downfall."},
+    {q:"What is hubris?", a:"The hero's arrogance or excessive pride — a disrespect for the natural order of the world."},
+    {q:"What is peripeteia?", a:"The hero's experience of a reversal of fate or fortune."},
+    {q:"What is anagnorisis?", a:"A pivotal moment in which the hero reaches an important realization."},
+    {q:"What is nemesis?", a:"The unavoidable fate of the hero, usually caused by his own hubris — literally 'revenge.'"},
+    {q:"What is catharsis?", a:"The audience's release of negative emotions such as pity and fear toward the end of the play."},
+    {q:"What are the six elements of a tragedy?", a:"Plot, Characters, Thought, Diction, Song, and Spectacle."},
+    {q:"Which element is the 'soul of tragedy'?", a:"Plot — the most important element, where the arrangement of incidents and actions exists."},
+    {q:"What is the prologue?", a:"The opening monologue or dialogue before the entrance of the chorus; presents the background."},
+    {q:"What is the parados?", a:"The entrance of the chorus through expressive songs and dances that leads to the main theme."},
+    {q:"What is a stasimon?", a:"The section where the chorus gives comment or reaction to the episodes."},
+    {q:"What is the exodus?", a:"The concluding part of the play and the final song of the chorus where the moral is revealed."},
+    {q:"Who are Oedipus' four children?", a:"Sons Eteocles and Polynices; daughters Antigone and Ismene."},
+    {q:"Who is Antigone?", a:"Oedipus' daughter who guides her blind father in exile and later defies Creon to bury her brother Polynices."},
+    {q:"What is a major irony in the play?", a:"Oedipus vows to find Laius' murderer but he is the murderer; Tiresias is blind yet sees the truth, while sighted Oedipus is blind to it."},
+    {q:"What does the play suggest about truth?", a:"Knowing the truth results in painful consequences."},
+    {q:"What three principles define a Greek tragedy?", a:"1) It evokes pity and fear. 2) The tragic hero must be essentially admirable and good. 3) The hero's demise comes from personal error or decision."}
+  ],
+
+  "Business & Resume": [
+    {q:"What is a business letter?", a:"A formal correspondence serving as written communication among customers, clients, stakeholders, investors, and other commercial purposes."},
+    {q:"What are the seven parts of a business letter?", a:"Heading, Date Line, Inside Address, Salutation, Body, Complimentary Close, and Signature."},
+    {q:"What are the optional parts of a business letter?", a:"Attention line, Subject or Reference line, and Enclosures."},
+    {q:"What are the four business letter styles?", a:"Full Block, Modified Block, Semi-Block, and Simplified."},
+    {q:"Describe the Full Block style.", a:"Every component in the format is aligned to the left. It is the most popular because of its simplicity."},
+    {q:"Describe the Modified Block style.", a:"The date line, complimentary close, and signature are typed at the right side of the page."},
+    {q:"Describe the Semi-Block style.", a:"All elements are left-aligned, except the beginning of each paragraph, which is indented. Ideal for handwritten letters."},
+    {q:"Describe the Simplified style.", a:"Similar to full block, but the salutation and complimentary close are omitted; the writer's name and title are typed in all caps."},
+    {q:"Resume vs. Curriculum Vitae?", a:"Resume — concise (1–2 pages) of experiences, education, and skills. CV ('course life') — in-depth (2+ pages) covering career path, distinctions, publications, awards; static."},
+    {q:"What are the three resume formats?", a:"Chronological, Functional, and Combination (Hybrid)."},
+    {q:"When should you use the chronological format?", a:"When demonstrating career progress, showing little work experience gaps, or applying for related work."},
+    {q:"When should you NOT use the chronological format?", a:"With multiple gaps in employment, career shifts into a new industry, or recurring job changes."},
+    {q:"When is the functional format best?", a:"For students with fewer work experiences but relevant skills, career shifts, or multiple gaps — it presents skills over dates."},
+    {q:"What is the combination format?", a:"It combines functional skill categories with dated employment history; focuses on skills and experience without hiding employment history."},
+    {q:"What are the parts of an email?", a:"Sender (From), Recipient (To), Subject Line, Salutation, Body, Attachment, and Closing."},
+    {q:"What does Cc stand for?", a:"Carbon copy — allows recipients to see other recipients who received a copy of the same email."},
+    {q:"What does Bcc stand for?", a:"Blind carbon copy — prevents recipients from knowing the other recipients of the email."},
+    {q:"What does P.S. stand for?", a:"Postscript — an additional remark other than the message in the body of the letter."},
+    {q:"What are the four body-structure paragraphs of an application letter?", a:"Opening (position + how you learned of it), Second (interest + relevant skills), Third (why you're the best fit + refer to resume), Closing (gratitude + contact details)."},
+    {q:"Hard skills vs. Soft skills?", a:"Hard skills — abilities acquired through life experience and training (technical tasks). Soft skills — natural personal traits (integrity, teamwork, adaptability)."},
+    {q:"What is ZIP?", a:"Zone Improvement Plan — four digits assigned to a locality that help post office personnel sort and distribute letters."},
+    {q:"What are the six common types of email?", a:"Transactional, Marketing, Apology, Announcement, Invitation, and Request."},
+    {q:"What are the resume guidelines?", a:"Length (1–2 pages), compelling content, professional appearance, readable fonts (10–12 pt), consistent format, editing, accuracy, skills matter, and formal language."}
+  ]
+};
+
+/* =========================================================
+   QUIZ QUESTIONS
+   ========================================================= */
+const QUIZ = [
+  /* --- LITERATURE --- */
+  {t:"Literature", q:"What does the Latin word littera mean?", o:["Story","Letter","Song","Book"], c:1,
+   e:"Literature comes from the Latin word littera, which means 'letter.'"},
+
+  {t:"Literature", q:"Which form of literature is considered the oldest?", o:["Prose","Drama","Poetry","Media"], c:2,
+   e:"Poetry is the oldest form — it existed through songs and spoken narratives even before writing."},
+
+  {t:"Literature", q:"Which literary form is a self-written life story?", o:["Biography","Memoir","Autobiography","Essay"], c:2,
+   e:"An autobiography is a self-written life story; a biography is written by someone else."},
+
+  {t:"Literature", q:"A five-line poem that conveys a vivid image is called a:", o:["Haiku","Cinquain","Sonnet","Ballad"], c:1,
+   e:"A cinquain derives its name from its structure — it consists of five lines."},
+
+  {t:"Literature", q:"Which essay type uses adjectives and figures of speech to create a mental image?", o:["Expository","Persuasive","Descriptive","Critical"], c:2,
+   e:"A descriptive essay uses adjectives, simile, and metaphor to give readers a mental image of the subject."},
+
+  {t:"Literature", q:"A haiku follows which syllable count?", o:["7-5-7","5-7-5","5-5-5","7-7-7"], c:1,
+   e:"A haiku has three lines following a 5-7-5 syllable count, usually about nature."},
+
+  /* --- MYTHOLOGY --- */
+  {t:"Mythology", q:"The word 'myth' is derived from the Greek word mythos, which means:", o:["God","Story or tale","Truth","Legend"], c:1,
+   e:"Mythos means 'story' or 'tale.' A myth is an ancient narrative explaining natural events or origins."},
+
+  {t:"Mythology", q:"Which type of myth explains the origin of a place, object, or concept?", o:["Historical","Psychological","Etiological","Religious"], c:2,
+   e:"Etiological myths come from the Greek word for 'reason' and explain origins."},
+
+  {t:"Mythology", q:"Who wrote Theogony around 700 BC?", o:["Homer","Sophocles","Hesiod","Apollodorus"], c:2,
+   e:"Hesiod wrote Theogony to explain the identities and alliances of the gods."},
+
+  {t:"Mythology", q:"How was Athena born?", o:["From the sea foam","From Zeus' forehead","From Gaea's tears","From a golden egg"], c:1,
+   e:"Zeus swallowed Metis; Athena emerged fully grown and dressed for war from Zeus' forehead."},
+
+  {t:"Mythology", q:"Who was punished by having a vulture peck out his liver every day?", o:["Atlas","Prometheus","Epimetheus","Cronus"], c:1,
+   e:"Prometheus gave fire to mankind and was chained to a mountain as punishment."},
+
+  {t:"Mythology", q:"Which god is associated with the trident and horses?", o:["Zeus","Hades","Ares","Poseidon"], c:3,
+   e:"Poseidon is the god of the sea, floods, drought, and horses; his symbol is the trident."},
+
+  {t:"Mythology", q:"What did Pandora release when she opened the box?", o:["Only hope","Only evils","All evils, but also hope","Wealth and power"], c:2,
+   e:"Pain, sickness, envy, greed, and other horrors flew out — but so did hope."},
+
+  /* --- ARCHETYPES --- */
+  {t:"Archetypes", q:"Who introduced the concept of the 'collective unconscious'?", o:["Sigmund Freud","Carl Jung","Joseph Campbell","Aristotle"], c:1,
+   e:"Carl Jung explained that humans have a 'collective unconscious' — shared likes, dislikes, and expectations about stories."},
+
+  {t:"Archetypes", q:"Which archetype is a normal person facing extraordinary circumstances who simply wants to survive?", o:["Hero","Antihero","Everyman","Trickster"], c:2,
+   e:"The Everyman does not feel obligated to save the world — he or she simply wants to survive a crisis."},
+
+  {t:"Archetypes", q:"Wolverine, who has heroic attributes but is gruff and unpleasant, is an example of which archetype?", o:["Villain","Antihero","Trickster","Everyman"], c:1,
+   e:"The antihero has several attributes of a hero but is not as conventionally 'good.'"},
+
+  {t:"Archetypes", q:"Which situational archetype is shown in The Lion King?", o:["Rags to Riches","Journeys","Death and Rebirth","Good vs. Evil"], c:2,
+   e:"The Lion King depicts a cub's baptism, an adult lion's death, and the cub growing up to lead."},
+
+  /* --- GILGAMESH --- */
+  {t:"Gilgamesh", q:"What city did Gilgamesh rule?", o:["Uz","Urshanabi","Uruk","Unapishtim"], c:2,
+   e:"Gilgamesh was the legendary King of Uruk, who ruled around 2700 BC."},
+
+  {t:"Gilgamesh", q:"Who was the hairy wild man who lived in the wilderness?", o:["Gilgamesh","Anu","Enkidu","Utnapishtim"], c:2,
+   e:"Enkidu was created by the gods to challenge Gilgamesh; they later became close friends."},
+
+  {t:"Gilgamesh", q:"What word best describes Gilgamesh at the start of the epic?", o:["Benevolent","Tyrannical","Humble","Cunning"], c:1,
+   e:"Gilgamesh began as a cruel and arrogant ruler who abused the people of Uruk."},
+
+  {t:"Gilgamesh", q:"Where did Enkidu and Gilgamesh travel to fight the monster Humbaba?", o:["City of Babylon","Dry Desert","Euphrates River","Cedar Forest"], c:3,
+   e:"They journeyed to the Cedar Forest to fight the monster Humbaba."},
+
+  {t:"Gilgamesh", q:"Why did the gods allow Enkidu to challenge Gilgamesh?", o:["They were following a prophecy","They wanted Gilgamesh replaced","Gilgamesh abused the people of Uruk","Gilgamesh thought he was stronger than the gods"], c:2,
+   e:"The people of Uruk complained to the gods about Gilgamesh's tyranny, so Enkidu was created."},
+
+  {t:"Gilgamesh", q:"What did Gilgamesh decide to do after Enkidu's death?", o:["Discover the secret of immortality","Surrender his throne","Become King of his own city","Curse Ishtar"], c:0,
+   e:"Grieving Enkidu's death, Gilgamesh resolved to find the secret of immortality."},
+
+  {t:"Gilgamesh", q:"What two secrets did Utnapishtim reveal to Gilgamesh?", o:["The secret of gold and the secret of war","The gods' plan to flood humanity and the secret of immortality","The location of Humbaba and the way to Uruk","The names of the gods and the date of the flood"], c:1,
+   e:"Utnapishtim revealed the gods' plan to destroy humanity by flood, and the secret of immortality granted to him."},
+
+  {t:"Gilgamesh", q:"What did Gilgamesh ultimately learn about eternal life?", o:["It can be earned through heroism","It belongs only to kings","It is the lasting legacy of one's works","It is found in the Cedar Forest"], c:2,
+   e:"Gilgamesh abandoned his quest and realized true immortality is the lasting legacy of one's accomplishments."},
+
+  {t:"Gilgamesh", q:"Who rediscovered a complete version of the Epic of Gilgamesh in 1839?", o:["Heinrich Schliemann","Arthur Evans","Austen Layard","Shin-Leqi-Unninni"], c:2,
+   e:"British archaeologist Austen Layard found it in Nineveh, in the library of Ashurbanipal."},
+
+  /* --- BOOK OF JOB --- */
+  {t:"Book of Job", q:"Where was the author of the Book of Job from?", o:["Uruk","Uz","Ur","Nineveh"], c:1,
+   e:"The anonymous non-Israelite author came from the land of Uz, southeast of ancient Israel."},
+
+  {t:"Book of Job", q:"How many sons and daughters did Job originally have?", o:["Three sons and three daughters","Seven sons and three daughters","Ten sons and two daughters","Seven sons and seven daughters"], c:1,
+   e:"Job had seven sons and three daughters before his trials (Job 1:2)."},
+
+  {t:"Book of Job", q:"How many sheep did Job own at the beginning?", o:["3,000","7,000","500","14,000"], c:1,
+   e:"Job owned 7,000 sheep, along with 3,000 camels, 500 yoke of oxen, and 500 female donkeys."},
+
+  {t:"Book of Job", q:"How many camels did Job own initially?", o:["500","1,000","3,000","6,000"], c:2,
+   e:"Job had 3,000 camels — long-distance freight carriers that enabled commerce over desert routes."},
+
+  {t:"Book of Job", q:"How many yoke of oxen did Job own at the start?", o:["500","1,000","3,000","7,000"], c:0,
+   e:"Job had 500 yoke of oxen (approximately 1,000 animals), indicating large-scale agriculture."},
+
+  {t:"Book of Job", q:"What was Job's status among the people of the East?", o:["A minor shepherd","A wandering prophet","The greatest man among all the people of the East","A forgotten exile"], c:2,
+   e:"Job 1:3 describes him as 'the greatest man among all the people of the East.'"},
+
+  {t:"Book of Job", q:"How did Satan torment Job's body?", o:["Fever","Boils","Deafness","Blindness"], c:1,
+   e:"Satan afflicted Job with severe boils from the soles of his feet to the crown of his head."},
+
+  {t:"Book of Job", q:"What did Job's wife tell him to do?", o:["Pray for healing","Curse God and die","Flee to another land","Blame his friends"], c:1,
+   e:"His wife said, 'Do you still hold fast to your integrity? Curse God and die!'"},
+
+  {t:"Book of Job", q:"How did Job respond when he lost his livestock, servants, and children?", o:["He cursed God","He worshipped God","He doubted God","He blamed his wife"], c:1,
+   e:"Job tore his robe, shaved his head, fell to the ground and worshipped, saying 'The Lord gave, and the Lord has taken away.'"},
+
+  {t:"Book of Job", q:"How long did Job's friends sit with him on the ground without speaking?", o:["3 days","5 days","7 days","9 days"], c:2,
+   e:"They sat with him seven days and seven nights, for they saw his suffering was very great."},
+
+  {t:"Book of Job", q:"What did Bildad compare Job's children to?", o:["Wisdom","Diamonds","Death","Strength"], c:2,
+   e:"Bildad compared Job's children to death, suggesting they died because of sin."},
+
+  {t:"Book of Job", q:"How did God speak to Job?", o:["Through a prophecy","Through a nightmare","Through a flowing river","Through a whirlwind"], c:3,
+   e:"God answered Job out of the whirlwind, humbling him by showing His power."},
+
+  {t:"Book of Job", q:"When did God restore Job's fortunes?", o:["When he fasted","When he acknowledged God's power","When he prayed for his friends","When he revered all his good acts"], c:2,
+   e:"After Job prayed for his friends, the Lord restored his fortunes and doubled all he had."},
+
+  {t:"Book of Job", q:"How many sheep did Job have after his restoration?", o:["7,000","10,000","14,000","21,000"], c:2,
+   e:"Job's restored wealth was double: 14,000 sheep, 6,000 camels, 1,000 yoke of oxen, 1,000 female donkeys."},
+
+  {t:"Book of Job", q:"What were the names of Job's three daughters after his restoration?", o:["Jemimah, Keziah, and Keren-Happuch","Sarah, Rebekah, and Rachel","Mary, Martha, and Elizabeth","Dinah, Tamar, and Ruth"], c:0,
+   e:"Job named them Jemimah, Keziah, and Keren-Happuch — the most beautiful women in all the land."},
+
+  {t:"Book of Job", q:"What unusual thing did Job do for his daughters?", o:["Made them priestesses","Gave them an inheritance along with their brothers","Sent them to another land","Married them to kings"], c:1,
+   e:"Job gave his daughters an inheritance along with their brothers — unusual for that time."},
+
+  {t:"Book of Job", q:"How long did Job live after his restoration?", o:["40 years","70 years","100 years","140 years"], c:3,
+   e:"Job lived 140 more years and saw four generations of descendants."},
+
+  {t:"Book of Job", q:"What is the main idea of the Book of Job regarding struggles?", o:["Life is a series of ups and downs","The comfort of friends is what we need","Never lose faith in your ability to overcome it","Use the experience to be stronger in the future"], c:2,
+   e:"The selection's main idea is to never lose faith in your ability to overcome struggles."},
+
+  {t:"Book of Job", q:"Who did God rebuke at the end of the book?", o:["Job","Job's wife","Job's three friends","Satan"], c:2,
+   e:"God turned on the friends who had defended God throughout the book but spoken falsely about Him."},
+
+  /* --- OEDIPUS --- */
+  {t:"Oedipus Rex", q:"What does the name 'Oedipus' mean?", o:["Ultimate king","Unknown destiny","Swollen foot","Bequeath throne"], c:2,
+   e:"Oedipus comes from the Greek word 'Oidipous,' which means 'swollen foot.'"},
+
+  {t:"Oedipus Rex", q:"What is the cause of the plague in Thebes?", o:["The excessive pride of the gods","A conspiracy against Oedipus","The undiscovered murderer of the old king","The effects of the Sphinx's riddle"], c:2,
+   e:"The plague will only be lifted if the murderer of King Laius is exiled."},
+
+  {t:"Oedipus Rex", q:"Where did Oedipus' biological parents leave him for dead?", o:["Colonus","Cithaeon","Thebes","Corinth"], c:1,
+   e:"Oedipus was abandoned on Mount Cithaeon with his ankles pinned together."},
+
+  {t:"Oedipus Rex", q:"Why does Jocasta attempt to stop Oedipus from speaking to the shepherd?", o:["She does not want to know the truth","She does not want to offend the oracle","She accepts the predestined fate of Thebes","She already knew the truth and knew Oedipus would be destroyed"], c:3,
+   e:"Jocasta had already realized the truth and knew it would destroy Oedipus."},
+
+  {t:"Oedipus Rex", q:"What punishment does Oedipus receive?", o:["Death","Exile","Disability","Dethronement"], c:1,
+   e:"Oedipus blinds himself and exiles himself from Thebes."},
+
+  {t:"Oedipus Rex", q:"Who became the ruler of Thebes at the end of the play?", o:["Tiresias","Eteocles","Polynices","Creon"], c:3,
+   e:"Creon, Jocasta's brother, becomes ruler of Thebes at the end."},
+
+  {t:"Oedipus Rex", q:"Which character represented the truth in the selection?", o:["Creon","Tiresias","Jocasta","Laius"], c:1,
+   e:"Tiresias is blind yet he knows the true nature of Oedipus — he represents truth."},
+
+  {t:"Oedipus Rex", q:"What is Oedipus' tragic flaw?", o:["Arrogance","Ambition","Passion","Greed"], c:0,
+   e:"Oedipus' tragic flaw is his arrogance (hubris), which drives his downfall."},
+
+  {t:"Oedipus Rex", q:"What truth about life does the play suggest?", o:["Forgiveness gives you a chance to discover what you deserve","Deception loses your inner core and desire for truth","Knowing the truth results in painful consequences","Being courageous comes with great freedom and potential"], c:2,
+   e:"The play suggests that knowing the truth results in painful consequences."},
+
+  {t:"Oedipus Rex", q:"Who were Oedipus' four children?", o:["Eteocles, Polynices, Antigone, and Ismene","Creon, Jocasta, Laius, and Tiresias","Antigone, Ismene, Haemon, and Creon","Polynices, Haemon, Antigone, and Jocasta"], c:0,
+   e:"Oedipus and Jocasta had two sons (Eteocles, Polynices) and two daughters (Antigone, Ismene)."},
+
+  /* --- GREEK TRAGEDY --- */
+  {t:"Greek Tragedy", q:"Which element is considered the 'soul of tragedy'?", o:["Characters","Plot","Diction","Spectacle"], c:1,
+   e:"Plot is the most important element — the soul of tragedy where the arrangement of incidents and actions exists."},
+
+  {t:"Greek Tragedy", q:"What is hamartia?", o:["The hero's arrogance","The reversal of fate","The hero's flaw that leads to his downfall","The audience's release of emotion"], c:2,
+   e:"Hamartia is the hero's fatal flaw that causes the tragedy to happen."},
+
+  {t:"Greek Tragedy", q:"What is anagnorisis?", o:["The hero's excessive pride","The pivotal moment of realization","The unavoidable fate of the hero","The choice of words"], c:1,
+   e:"Anagnorisis is the pivotal moment in which the hero reaches a realization."},
+
+  {t:"Greek Tragedy", q:"What is catharsis?", o:["The hero's downfall","The audience's release of pity and fear","The reversal of fortune","The chorus's final song"], c:1,
+   e:"Catharsis is the purification or purging of feelings that Aristotle believed was the purpose of tragedy."},
+
+  {t:"Greek Tragedy", q:"Which section of a Greek play contains the final song where the moral is revealed?", o:["Prologue","Parados","Stasimon","Exodus"], c:3,
+   e:"The exodus is the concluding part of the play and the final song of the chorus."},
+
+  {t:"Greek Tragedy", q:"According to Aristotle, the tragic hero must be:", o:["Perfect and flawless","Essentially admirable and good","Evil and cruel","Ordinary and unremarkable"], c:1,
+   e:"Audiences relate more to the 'good guys,' which is why tragedies ask, 'Why do bad things happen to good people?'"},
+
+  {t:"Greek Tragedy", q:"Which playwright wrote Oedipus Rex?", o:["Aeschylus","Euripides","Sophocles","Aristophanes"], c:2,
+   e:"Sophocles wrote Oedipus Rex, which was first runner-up at the 429 BC festival of Dionysus."},
+
+  /* --- BUSINESS / RESUME --- */
+  {t:"Business Writing", q:"What is the standard order of parts in a business letter?", o:["Salutation, Heading, Body, Date, Closing, Signature","Heading, Date, Inside Address, Salutation, Body, Complimentary Close, Signature","Date, Salutation, Heading, Body, Signature, Closing","Inside Address, Heading, Salutation, Date, Body, Signature"], c:1,
+   e:"The standard order is Heading, Date Line, Inside Address, Salutation, Body, Complimentary Close, and Signature."},
+
+  {t:"Business Writing", q:"In which letter style is every component aligned to the left?", o:["Modified Block","Semi-Block","Full Block","Simplified"], c:2,
+   e:"In Full Block style, every component is aligned to the left — it is the most popular because of its simplicity."},
+
+  {t:"Business Writing", q:"Which letter style omits the salutation and complimentary close?", o:["Full Block","Semi-Block","Simplified","Modified Block"], c:2,
+   e:"The Simplified style is like full block except the salutation and complimentary close are omitted, and the writer's name and title are in all caps."},
+
+  {t:"Business Writing", q:"Which resume format focuses on skills over dates and is ideal for students with fewer work experiences?", o:["Chronological","Functional","Combination","Hybrid"], c:1,
+   e:"The functional format presents skills and qualifications over experiences without revealing dates."},
+
+  {t:"Business Writing", q:"Which resume format is recommended for those with steady employment history?", o:["Functional","Chronological","Combination","Simplified"], c:1,
+   e:"Chronological is recommended for those with working experience or a steady employment history."},
+
+  {t:"Business Writing", q:"What does Bcc stand for in an email?", o:["Blind carbon copy","Basic carbon copy","Blind courtesy copy","Business copy"], c:0,
+   e:"Bcc (blind carbon copy) prevents recipients from knowing the other recipients of the email."},
+
+  {t:"Business Writing", q:"What is the difference between a resume and a CV?", o:["A resume is longer than a CV","A CV is always one page","A CV is an in-depth document over two or more pages; a resume is concise","They are exactly the same"], c:2,
+   e:"A CV ('course life') is an in-depth document over two or more pages; a resume is concise (1–2 pages)."},
+
+  {t:"Business Writing", q:"Which type of email is used to acknowledge a mistake and ask for forgiveness?", o:["Transactional","Marketing","Apology","Announcement"], c:2,
+   e:"An apology email acknowledges a mistake or shortcoming, expresses regret, and asks for forgiveness or patience."}
+];
+
+/* =========================================================
+   FLASHCARD LOGIC
+   ========================================================= */
+const deckBar = document.getElementById('deckBar');
+const cardEl = document.getElementById('card');
+const fcQ = document.getElementById('fcQ');
+const fcA = document.getElementById('fcA');
+const fcCounter = document.getElementById('fcCounter');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const shuffleBtn = document.getElementById('shuffleBtn');
+
+let currentDeck = Object.keys(DECKS)[0];
+let cardList = [...DECKS[currentDeck]];
+let cardIndex = 0;
+
+function buildDeckBar(){
+  deckBar.innerHTML = '';
+  Object.keys(DECKS).forEach(name => {
+    const b = document.createElement('button');
+    b.textContent = name + ' (' + DECKS[name].length + ')';
+    if(name === currentDeck) b.classList.add('active');
+    b.addEventListener('click', () => {
+      currentDeck = name;
+      cardList = [...DECKS[name]];
+      cardIndex = 0;
+      buildDeckBar();
+      renderCard();
+    });
+    deckBar.appendChild(b);
+  });
+}
+
+function renderCard(){
+  cardEl.classList.remove('flipped');
+  const c = cardList[cardIndex];
+  fcQ.textContent = c.q;
+  fcA.textContent = c.a;
+  fcCounter.textContent = (cardIndex + 1) + ' / ' + cardList.length;
+  prevBtn.disabled = cardIndex === 0;
+  nextBtn.disabled = cardIndex === cardList.length - 1;
+}
+
+cardEl.addEventListener('click', () => cardEl.classList.toggle('flipped'));
+prevBtn.addEventListener('click', () => { if(cardIndex > 0){ cardIndex--; renderCard(); }});
+nextBtn.addEventListener('click', () => { if(cardIndex < cardList.length - 1){ cardIndex++; renderCard(); }});
+shuffleBtn.addEventListener('click', () => {
+  for(let i = cardList.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [cardList[i], cardList[j]] = [cardList[j], cardList[i]];
+  }
+  cardIndex = 0;
+  renderCard();
+});
+
+document.addEventListener('keydown', e => {
+  if(!document.getElementById('flash').classList.contains('active')) return;
+  if(e.key === 'ArrowLeft'){ prevBtn.click(); }
+  if(e.key === 'ArrowRight'){ nextBtn.click(); }
+  if(e.key === ' '){ e.preventDefault(); cardEl.classList.toggle('flipped'); }
+});
+
+/* =========================================================
+   QUIZ LOGIC
+   ========================================================= */
+const qText = document.getElementById('qText');
+const qTag = document.getElementById('qTag');
+const optsEl = document.getElementById('opts');
+const explainEl = document.getElementById('explain');
+const nextQ = document.getElementById('nextQ');
+const qProgress = document.getElementById('qProgress');
+const qScore = document.getElementById('qScore');
+const barFill = document.getElementById('barFill');
+const quizArea = document.getElementById('quizArea');
+const resultEl = document.getElementById('result');
+const scoreRing = document.getElementById('scoreRing');
+const resultSub = document.getElementById('resultSub');
+const resultMsg = document.getElementById('resultMsg');
+const resultTitle = document.getElementById('resultTitle');
+
+let quizOrder = [];
+let qIndex = 0;
+let score = 0;
+let answered = false;
+
+function initQuiz(){
+  quizOrder = QUIZ.map((q, i) => i);
+  for(let i = quizOrder.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [quizOrder[i], quizOrder[j]] = [quizOrder[j], quizOrder[i]];
+  }
+  qIndex = 0; score = 0; answered = false;
+  quizArea.style.display = 'block';
+  resultEl.classList.remove('show');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  answered = false;
+  const q = QUIZ[quizOrder[qIndex]];
+  qTag.textContent = q.t;
+  qText.textContent = q.q;
+  qProgress.textContent = 'Question ' + (qIndex + 1) + ' of ' + quizOrder.length;
+  qScore.textContent = 'Score: ' + score;
+  barFill.style.width = ((qIndex) / quizOrder.length * 100) + '%';
+  explainEl.classList.remove('show');
+  explainEl.innerHTML = '';
+  nextQ.classList.remove('show');
+  nextQ.textContent = (qIndex === quizOrder.length - 1) ? 'See Results →' : 'Next Question →';
+
+  optsEl.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.o.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = '<span class="letter">' + letters[i] + '</span><span>' + opt + '</span>';
+    btn.addEventListener('click', () => selectAnswer(i));
+    optsEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(choice){
+  if(answered) return;
+  answered = true;
+  const q = QUIZ[quizOrder[qIndex]];
+  const buttons = optsEl.querySelectorAll('.opt');
+
+  buttons.forEach((b, i) => {
+    b.classList.add('locked');
+    if(i === q.c) b.classList.add('correct');
+    if(i === choice && choice !== q.c) b.classList.add('wrong');
+  });
+
+  if(choice === q.c){
+    score++;
+    qScore.textContent = 'Score: ' + score;
+  }
+
+  explainEl.innerHTML = '<strong>' + (choice === q.c ? '✓ Correct!' : '✗ Not quite.') + '</strong> ' + q.e;
+  explainEl.classList.add('show');
+  nextQ.classList.add('show');
+}
+
+nextQ.addEventListener('click', () => {
+  if(qIndex < quizOrder.length - 1){
+    qIndex++;
+    renderQuestion();
+  } else {
+    showResults();
+  }
+});
+
+function showResults(){
+  quizArea.style.display = 'none';
+  resultEl.classList.add('show');
+  const pct = Math.round(score / quizOrder.length * 100);
+  scoreRing.textContent = pct + '%';
+  resultSub.textContent = 'You got ' + score + ' out of ' + quizOrder.length + ' correct.';
+
+  let msg = '';
+  if(pct === 100) msg = '🏆 Perfect score! You have mastered this material.';
+  else if(pct >= 85) msg = '⭐ Excellent work! Just a few details to review.';
+  else if(pct >= 70) msg = '👍 Good job! Review the missed items and try again.';
+  else if(pct >= 50) msg = '📖 Fair. Go back to the flashcards and retake the quiz.';
+  else msg = '💪 Keep studying! Use the flashcards to strengthen your recall.';
+  resultMsg.textContent = msg;
+  resultTitle.textContent = 'Quiz Complete!';
+}
+
+document.getElementById('retryBtn').addEventListener('click', initQuiz);
+
+/* =========================================================
+   TABS
+   ========================================================= */
+document.querySelectorAll('.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* =========================================================
+   INIT
+   ========================================================= */
+buildDeckBar();
+renderCard();
+initQuiz();
+</script>
+</body>
+</html>
