@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>English 4 Reviewer — Flashcards &amp; Quiz</title>
+<title>English 4 Reviewer — Detailed Flashcards &amp; Quiz</title>
 <style>
   :root{
     --bg:#0d1024;
-    --bg2:#161a38;
     --surface:#1c2144;
     --surface2:#252b55;
     --line:#333a6b;
@@ -30,7 +29,7 @@
     padding:22px 16px 60px;
     line-height:1.55;
   }
-  .app{max-width:900px;margin:0 auto;}
+  .app{max-width:960px;margin:0 auto;}
 
   header{text-align:center;margin-bottom:24px;}
   header h1{
@@ -65,7 +64,7 @@
   .panel.active{display:block;}
   @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
 
-  /* ---------- DECK BAR ---------- */
+  /* DECK BAR */
   .deck-bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;}
   .deck-bar button{
     background:var(--surface);
@@ -85,10 +84,10 @@
     border-color:var(--accent);
   }
 
-  /* ---------- FLASHCARD ---------- */
+  /* FLASHCARD */
   .card{
     perspective:1400px;
-    height:400px;
+    height:420px;
     cursor:pointer;
     margin-bottom:18px;
   }
@@ -130,10 +129,17 @@
   }
   .card-back .card-label{color:#7fd3ff;}
   .card-face p{
-    font-size:clamp(1rem,2.5vw,1.18rem);
+    font-size:clamp(.95rem,2.2vw,1.1rem);
     text-align:center;
     font-weight:500;
   }
+  .card-face ul{
+    text-align:left;
+    font-size:.92rem;
+    padding-left:20px;
+    margin-top:8px;
+  }
+  .card-face ul li{margin-bottom:5px;}
   .card-hint{
     text-align:center;color:var(--muted);font-size:.75rem;
     margin-top:8px;margin-bottom:14px;
@@ -162,7 +168,7 @@
     font-variant-numeric:tabular-nums;
   }
 
-  /* ---------- QUIZ ---------- */
+  /* QUIZ */
   .quiz-top{
     display:flex;justify-content:space-between;align-items:center;
     margin-bottom:12px;font-size:.82rem;color:var(--muted);font-weight:600;
@@ -240,7 +246,7 @@
   #nextQ:hover{filter:brightness(1.15);}
   #nextQ.show{display:block;}
 
-  /* ---------- RESULTS ---------- */
+  /* RESULTS */
   .result{
     background:var(--surface);
     border:1px solid var(--line);
@@ -271,7 +277,7 @@
   .result button:hover{filter:brightness(1.15);}
 
   @media(max-width:600px){
-    .card{height:340px;}
+    .card{height:360px;}
     .card-face{padding:22px 18px;}
     .q-box{padding:20px 16px;}
   }
@@ -281,7 +287,7 @@
 <div class="app">
   <header>
     <h1>English 4 Reviewer</h1>
-    <p>Literature · Mythology · Gilgamesh · Book of Job · Oedipus Rex · Business Writing</p>
+    <p>Detailed Story Summaries · Flashcards · Quiz · 1st Quarter</p>
   </header>
 
   <nav class="tabs">
@@ -289,7 +295,7 @@
     <button data-tab="quiz">📝 Quiz</button>
   </nav>
 
-  <!-- ============ FLASHCARDS ============ -->
+  <!-- FLASHCARDS -->
   <section id="flash" class="panel active">
     <div class="deck-bar" id="deckBar"></div>
     <div class="card" id="card">
@@ -303,7 +309,7 @@
         <div class="card-face card-back">
           <div>
             <span class="card-label">Answer</span>
-            <p id="fcA"></p>
+            <div id="fcA"></div>
           </div>
         </div>
       </div>
@@ -317,11 +323,11 @@
     </div>
   </section>
 
-  <!-- ============ QUIZ ============ -->
+  <!-- QUIZ -->
   <section id="quiz" class="panel">
     <div id="quizArea">
       <div class="quiz-top">
-        <span id="qProgress">Question 1 of 45</span>
+        <span id="qProgress">Question 1 of 70</span>
         <span id="qScore">Score: 0</span>
       </div>
       <div class="bar"><div class="bar-fill" id="barFill"></div></div>
@@ -346,396 +352,501 @@
 
 <script>
 /* =========================================================
-   FLASHCARD DECKS
+   FLASHCARD DECKS — DETAILED
    ========================================================= */
 const DECKS = {
-  "Lit Basics": [
-    {q:"Where does the word 'literature' come from?", a:"Latin littera, meaning 'letter.'"},
-    {q:"What are the five forms of literature?", a:"Poetry, Drama, Prose, Oral Literature, and Media."},
-    {q:"Which literary form is considered the oldest?", a:"Poetry — it existed through songs and spoken narratives before writing."},
-    {q:"Novel vs. Short Story?", a:"Novel — longer, tackles complicated plots and storylines, often in chapters. Short Story — a single plot, all attention devoted to resolving it."},
-    {q:"What is a memoir?", a:"A focused account of a specific aspect or period of a real person's life — a shorter, more focused biography."},
-    {q:"What is an autobiography?", a:"A self-written life story."},
-    {q:"What is a biography?", a:"A complete retelling of a person's life from birth to death."},
-    {q:"Haiku structure and theme?", a:"Originally Japanese; three lines with a 5-7-5 syllable count; usually about nature and simple pleasures."},
-    {q:"What is a sonnet?", a:"14 lines in iambic pentameter; from Italian meaning 'little sound or song'; Shakespeare's most-used form."},
-    {q:"What is an epic?", a:"A long narrative poem detailing the adventures of a hero."},
-    {q:"What is a ballad?", a:"A slow love song meant to be sung; typically 4–6 lines per stanza with a definite rhyming pattern."},
-    {q:"What is a cinquain?", a:"A five-line poem that conveys a vivid image."},
-    {q:"What is a lyric poem?", a:"Often accompanied by music; expresses one's feelings and does not necessarily include a narrative."},
-    {q:"Fable vs. Myth?", a:"Fable — features personified animals as characters. Myth — about gods, goddesses, and supernatural characters with magical/fantastical elements."},
-    {q:"What are the five types of essay?", a:"Narrative, Descriptive, Expository, Critical, and Persuasive."},
-    {q:"Which form is unique because of how it is delivered?", a:"Oral Literature — it uses poetry's structure but its performative aspect makes it distinct."}
+
+  "Gilgamesh (Detailed)": [
+    {q:"Who were Gilgamesh's parents?", a:"His mother was the goddess Ninsun; his father was the mortal king Lugalbanda. He was two-thirds divine and one-third human."},
+    {q:"What city did Gilgamesh rule, and what was significant about its walls?", a:"He ruled Uruk, a great walled city. He built magnificent walls that become symbolic of his legacy. The epic opens and closes with praise for Uruk's walls."},
+    {q:"How did Gilgamesh oppress the people of Uruk?", a:"He forced young men to labor endlessly on his building projects; he claimed the right to sleep with every new bride before her husband (droit du seigneur); he exhausted his subjects; no one could challenge him."},
+    {q:"Who did the people of Uruk pray to for relief?", a:"Anu, the sky god and father of the gods."},
+    {q:"Who created Enkidu, and from what?", a:"Aruru, the goddess of creation, fashioned him from clay as a wild man."},
+    {q:"Describe Enkidu before civilization.", a:"Covered in hair like an animal; ate grass with gazelles; drank from watering holes with wild beasts; lived in the wilderness; protected animals by destroying hunters' traps."},
+    {q:"Who was Shamhat, and what was her role?", a:"A temple prostitute (hierodule/sacred servant of Ishtar). She was sent by Gilgamesh to civilize Enkidu at the watering hole."},
+    {q:"What happened to Enkidu after six days and seven nights with Shamhat?", a:"The wild animals fled from him; he could no longer run with the gazelles; but he gained understanding, wisdom, and capacity for human connection. Shamhat taught him to eat bread, drink beer, wear clothes, and anoint with oil."},
+    {q:"What were Gilgamesh's two prophetic dreams?", a:"1) A meteor fell from the sky that Gilgamesh loved like a wife. 2) He found an axe in the street and loved it. Ninsun interpreted both as the coming of a companion like a brother."},
+    {q:"Describe the wrestling match between Gilgamesh and Enkidu.", a:"They grappled through the streets; doorposts shook and walls trembled; neither could gain advantage — perfectly matched. It ended in a draw; they embraced and became inseparable friends."},
+    {q:"Who adopted Enkidu, making him and Gilgamesh brothers?", a:"Ninsun, Gilgamesh's mother, adopted Enkidu as her own son."},
+    {q:"Why did Gilgamesh want to go to the Cedar Forest?", a:"He sought eternal fame through heroic deeds, since he could not achieve immortality. He said: 'Who can scale heaven? Only the gods live forever. As for mankind, numbered are their days. Whatever they achieve is but the wind.'"},
+    {q:"Who was Humbaba?", a:"A fearsome monster appointed by Enlil to guard the Cedar Forest. His voice was like thunder, his breath was fire, his presence caused paralysis and death; he was said to be immortal."},
+    {q:"Who helped Gilgamesh and Enkidu in the battle against Humbaba?", a:"Shamash, the sun god, sent thirteen winds to blind and confuse Humbaba."},
+    {q:"What did Humbaba do before he died?", a:"He pleaded for his life, promising to serve Gilgamesh. Enkidu urged Gilgamesh not to listen. Humbaba cursed Enkidu, saying Enkidu would not live long after this deed."},
+    {q:"What did Gilgamesh and Enkidu do after killing Humbaba?", a:"They cut down the sacred cedars and floated them down the Euphrates River to Uruk."},
+    {q:"Who proposed marriage to Gilgamesh after his return?", a:"Ishtar, the goddess of love and war."},
+    {q:"How did Gilgamesh reject Ishtar?", a:"With a blistering insult, reciting her former lovers and how she destroyed each: Tammuz (condemned to underworld), the lion (trapped in pits), the horse (bridle and spur), the shepherd (turned into a wolf), the gardener (turned into a frog)."},
+    {q:"What did Ishtar demand from Anu, and what threat did she make?", a:"She demanded the Bull of Heaven to punish Gilgamesh; she threatened to break open the gates of the underworld and release the dead to devour the living if Anu refused."},
+    {q:"Describe the destruction caused by the Bull of Heaven.", a:"Its first snort opened a pit swallowing one hundred men; second snort swallowed two hundred; third snort threatened to swallow Enkidu."},
+    {q:"How was the Bull of Heaven killed?", a:"Enkidu grabbed it by the horns; Gilgamesh drove his sword into its neck. They cut out its heart and offered it to Shamash."},
+    {q:"What did Enkidu do when Ishtar cursed them?", a:"He threw a piece of the bull's thigh at her and shouted insults, saying he would do the same to her if he could."},
+    {q:"What did the divine council decide after the killing of Humbaba and the Bull?", a:"Enlil argued Enkidu must die, but Gilgamesh should be spared. Shamash protested, but Enlil was adamant: 'Enkidu must die.'"},
+    {q:"How long did Enkidu suffer before dying?", a:"Twelve days. He was tormented by nightmares of the underworld — a place of dust and darkness where the dead eat clay and drink mud."},
+    {q:"How did Gilgamesh grieve for Enkidu?", a:"He refused to allow anyone to bury his friend for seven days and seven nights. He wept: 'My friend, whom I loved, has turned to clay. Shall I not be like him?'"},
+    {q:"Who was Utnapishtim?", a:"The only mortal granted immortality by the gods. Gilgamesh sought him to learn the secret of eternal life."},
+    {q:"What obstacles did Gilgamesh face on his journey to Utnapishtim?", a:"Scorpion-men guarding a mountain pass; a tunnel of darkness (twelve leagues); a garden of jewels; the great sea that encircles the world."},
+    {q:"Who was Siduri, and what advice did she give?", a:"A divine tavern keeper by the sea. She advised: 'When the gods created man, they allotted to him death, but life they retained. Fill your belly with good things; day and night, dance and be merry, feast and rejoice... for this too is the lot of man.'"},
+    {q:"Who was Urshanabi?", a:"The boatman of Utnapishtim who ferried Gilgamesh across the waters of death."},
+    {q:"What was Utnapishtim's former city?", a:"Shurrupak, which stood on the banks of the Euphrates River."},
+    {q:"Why did the gods decide to send the flood?", a:"The world had become too noisy — the clamor of humans disturbed the gods' sleep. Enlil convinced the divine council to send a flood."},
+    {q:"How did Ea warn Utnapishtim?", a:"He whispered the secret through the walls of Utnapishtim's reed house: 'Reed-house, reed-house! Wall, O wall... tear down your house and build a boat, abandon possessions and look for life.'"},
+    {q:"What were the dimensions of Utnapishtim's boat?", a:"A perfect cube, each side 120 cubits (approximately 180 feet), with seven decks, divided into nine sections."},
+    {q:"What did Utnapishtim load into the boat?", a:"All his gold and silver, his family and relatives, the seeds of all living creatures, wild and tame animals, and the craftsmen who helped build the boat."},
+    {q:"How long did the flood storm rage?", a:"Six days and six nights. On the seventh day, the storm subsided and the sea grew calm."},
+    {q:"Where did Utnapishtim's boat land?", a:"On Mount Nisir (also called Nimush). The boat held fast for seven days."},
+    {q:"What three birds did Utnapishtim send out, and what happened?", a:"1) Dove — found no resting place, returned. 2) Swallow — found no resting place, returned. 3) Raven — saw waters retreated, ate, flew around, cawed, and did not return."},
+    {q:"What did Utnapishtim do after the flood?", a:"He opened the boat to the four winds, made a sacrifice on the mountain top — seven cauldrons, wood, cane, cedar, and myrtle. The gods smelled the sweet savor and gathered like flies."},
+    {q:"What did Ishtar do at the sacrifice?", a:"She swore by her necklace of lapis lazuli that she would remember these days, and invited all the gods except Enlil, who brought the flood without reflection."},
+    {q:"How did Ea rebuke Enlil?", a:"'How could you so senselessly bring down the flood? Lay upon the sinner his sin... Would that a lion had ravaged mankind rather than the flood... Would that pestilence had wasted mankind rather than the flood.'"},
+    {q:"What reward did Enlil give Utnapishtim?", a:"He blessed Utnapishtim and his wife: 'Henceforth he and his wife shall live in the distance at the mouth of the rivers.' They were granted immortality."},
+    {q:"What test did Utnapishtim give Gilgamesh?", a:"To prevail against sleep for six days and seven nights. Gilgamesh immediately fell asleep. Utnapishtim's wife baked a loaf each day and marked the wall."},
+    {q:"What did the loaves show?", a:"The first was hard, second like leather, third soggy, fourth moldy, fifth mildewed, sixth fresh, seventh still on the embers — proving Gilgamesh slept the entire time."},
+    {q:"What secret did Utnapishtim reveal about a plant?", a:"A plant that grows under the water, with a prickle like a thorn, that restores lost youth to a man. It would not grant immortality, but renewal."},
+    {q:"How did Gilgamesh retrieve the plant?", a:"He opened the sluices, tied heavy stones to his feet, dragged himself to the water-bed, saw the plant, took it despite the pricks, cut the stones, and was thrown onto the shore."},
+    {q:"What happened to the youth-restoring plant?", a:"While Gilgamesh bathed in a cool well, a serpent sensed the sweetness, rose from the water, snatched the plant, and immediately sloughed its skin — symbolizing the renewal Gilgamesh sought."},
+    {q:"What did Gilgamesh learn about immortality?", a:"True immortality is not living forever but the lasting legacy of one's works — the walls of Uruk, the city, the story itself."},
+    {q:"What are the central themes of the Epic of Gilgamesh?", a:"1) The inevitability of death. 2) The value of friendship. 3) The search for meaning. 4) The limits of human power. 5) Legacy as immortality."},
+    {q:"What did the narrator say about Gilgamesh at the end?", a:"'He was wise, he saw mysteries and knew secret things, he brought us a tale of the days before the flood. He went a long journey, was weary, worn out with labor, and returning engraved on a stone the whole story.'"}
   ],
 
-  "Mythology": [
-    {q:"What does 'myth' mean?", a:"From Greek mythos = 'story' or 'tale'; an ancient narrative explaining natural events, origins, or practices."},
-    {q:"What are the three types of myths?", a:"Etiological, Historical, and Psychological."},
-    {q:"What is an etiological myth?", a:"One that explains the origin of a place, object, or concept — from the Greek word for 'reason.'"},
-    {q:"Who said 'Myths teach meaning'?", a:"Joseph Campbell, American professor of literature."},
-    {q:"Who wrote Theogony and when?", a:"Hesiod, around 700 BC — the first written cosmogony in Greek mythology."},
-    {q:"What are the four primordial beings?", a:"Chaos (the gap), Gaea (earth), Tartarus (abyss), and Eros (love)."},
-    {q:"Who were Cronus and Rhea's children?", a:"Hestia, Demeter, Hera, Hades, Poseidon, and Zeus."},
-    {q:"How was Aphrodite born?", a:"From the sea after Cronus castrated Uranus and threw the severed part into the ocean."},
-    {q:"How was Athena born?", a:"Zeus swallowed Metis; Athena emerged fully grown and dressed for war from Zeus' forehead."},
-    {q:"What was the Titanomachy?", a:"The war between the Titans (led by Atlas) and the gods (led by Zeus). Zeus won."},
-    {q:"What did Prometheus do, and what was his punishment?", a:"He gave fire to mankind (meant only for gods); he was chained to a mountain for a vulture to peck out his liver daily."},
-    {q:"What did Pandora release from the box?", a:"All evils — pain, sickness, envy, greed, and other horrors — but also hope."},
-    {q:"What is Zeus' identity and symbols?", a:"King of all gods; symbols: eagle, lightning, thunderbolt, and scepter."},
-    {q:"What is Poseidon's identity and symbols?", a:"God of the sea, floods, drought, and horses; symbols: trident, horses, dolphins."},
-    {q:"What is Athena's identity and symbols?", a:"Goddess of wisdom, warfare, and handicrafts; symbols: olive tree, owl, spear, shield."},
-    {q:"What is Aphrodite's identity and symbols?", a:"Goddess of love and beauty; symbols: myrtle wreath, apple, scallop shell, dove."},
-    {q:"What were the three categories of Ancient Greek mythology?", a:"Religious myths, Legends or sagas, and Folktales."},
-    {q:"Who were the three great tragic playwrights of Athens?", a:"Aeschylus, Sophocles, and Euripides."}
-  ],
-
-  "Archetypes": [
-    {q:"What is an archetype?", a:"A story element meant to inject something universally human into the reading, viewing, or listening experience."},
-    {q:"Who introduced the 'collective unconscious'?", a:"Psychologist Carl Jung."},
-    {q:"What are the five common character archetypes?", a:"The Hero, The Villain, The Antihero, The Everyman, and The Trickster/Jester."},
-    {q:"Describe the Hero archetype.", a:"Comes from ordinary life but is called to adventure; confronts their darkest fear in order to transform and overcome conflict."},
-    {q:"Describe the Villain archetype.", a:"Known for being evil; motivations become clear (fear or pursuit of power); their main vice parallels the hero's main virtue."},
-    {q:"Describe the Antihero.", a:"Has heroic attributes but is not as conventionally 'good' as a hero — e.g., Wolverine."},
-    {q:"Describe the Everyman.", a:"A normal person facing extraordinary circumstances; does not feel obligated to save the world — simply wants to survive."},
-    {q:"Describe the Trickster/Jester.", a:"Flexible; can be good or evil; breaks society's (even nature's) rules and laughs at terrifying things — e.g., Bugs Bunny."},
-    {q:"What are the five situational archetypes?", a:"Journeys, Good vs. Evil, Natural vs. Mechanistic World, Death and Rebirth, and Rags to Riches."},
-    {q:"Give an example of Death and Rebirth.", a:"The Lion King — a cub's baptism, an adult lion's death, and the cub growing up to take over leadership."},
-    {q:"Give an example of Rags to Riches.", a:"The Princess Diaries — a nerdy schoolgirl transforms into a long-lost princess."},
-    {q:"Give an example of Natural vs. Mechanistic World.", a:"Wall-E — an emotionally intelligent robot compacts garbage while humanity waits in a spaceship."},
-    {q:"What archetypal elements are commonly used?", a:"Unique births, mysteries, extraordinary powers, tragic flaws, rites of passage, and nemeses."}
-  ],
-
-  "Gilgamesh": [
-    {q:"Who was Gilgamesh?", a:"King of Uruk who ruled around 2700 BC; the epic is based on the legendary adventures attributed to him."},
-    {q:"What is the earliest surviving great work of literature?", a:"The Epic of Gilgamesh — an ancient Mesopotamian odyssey."},
-    {q:"Who rediscovered the complete version, and when?", a:"British archaeologist Austen Layard in 1839, in Nineveh (the library of Ashurbanipal)."},
-    {q:"Who wrote the Akkadian version?", a:"Babylonian writer Shin-Leqi-Unninni (1300–1000 BCE)."},
-    {q:"What is the oldest existing version of the epic?", a:"The one dating back to 2000 BC in Sumerian cuneiform."},
-    {q:"Who was Enkidu?", a:"A hairy wild man created by the gods to challenge Gilgamesh; he became Gilgamesh's closest friend."},
-    {q:"Who was Humbaba?", a:"The monster in the Cedar Forest whom Gilgamesh and Enkidu fight."},
-    {q:"Who was Utnapishtim?", a:"The flood hero granted immortality by the gods; he tells Gilgamesh the secrets of the gods."},
-    {q:"Who was Urshanabi?", a:"The boatman who leads Gilgamesh to Uruk at the end of the epic."},
-    {q:"What two secrets did Utnapishtim reveal?", a:"1) The gods planned to destroy humanity by a flood. 2) The secret of immortality, which was granted to Utnapishtim."},
-    {q:"What did Gilgamesh learn about eternal life?", a:"That true immortality is not living forever — it is the lasting legacy of one's works (like the walls of Uruk)."},
-    {q:"How is Gilgamesh described at the start of the epic?", a:"Tyrannical, cruel, and arrogant."},
-    {q:"Why did the gods allow Enkidu to challenge Gilgamesh?", a:"Because Gilgamesh abused the people of Uruk."},
-    {q:"What happened after Enkidu's death?", a:"Gilgamesh grieved deeply and resolved to discover the secret of immortality."},
-    {q:"How does the Gilgamesh flood compare to Noah's flood?", a:"Both feature a divine decision to flood the world, a chosen survivor, a boat, birds sent out to find land, a sacrifice, and gods who regret the destruction."},
-    {q:"What city did Gilgamesh rule?", a:"Uruk."},
-    {q:"What does the Gilgamesh story teach about life?", a:"Our lives are defined not just by ourselves or the gods, but also by the people we meet along the way."}
-  ],
-
-  "Book of Job": [
-    {q:"Who wrote the Book of Job?", a:"An anonymous non-Israelite from the land of Uz, southeast of ancient Israel."},
-    {q:"Where is the Book of Job located in the biblical canon?", a:"In the Ketuvim ('writings'), the third section of the biblical canon."},
-    {q:"How does God describe Job?", a:"Blameless and upright, one who fears God and turns away from evil — 'there is none like him on the earth.'"},
-    {q:"How many children did Job originally have?", a:"Seven sons and three daughters."},
-    {q:"What was Job's initial wealth?", a:"7,000 sheep, 3,000 camels, 500 yoke of oxen, 500 female donkeys, and a very large household."},
-    {q:"What title did Job hold among the people of the East?", a:"He was 'the greatest man among all the people of the East.'"},
-    {q:"Who challenged Job's faith in heaven?", a:"Satan (the accuser), who appeared among the 'sons of God.'"},
-    {q:"What was the wager between God and Satan?", a:"Satan claimed Job only feared God because of blessings; God permitted Satan to test Job but forbade taking his life."},
-    {q:"What were the four calamities that struck Job?", a:"1) Sabeans stole his oxen and donkeys. 2) Fire from heaven burned his sheep. 3) Chaldeans stole his camels. 4) A great wind collapsed the house, killing all ten children."},
-    {q:"How did Job respond to the first calamities?", a:"He tore his robe, shaved his head, fell to the ground and worshipped: 'The Lord gave, and the Lord has taken away; blessed be the name of the Lord.'"},
-    {q:"How did Satan torment Job's body?", a:"With severe boils from the soles of his feet to the crown of his head."},
-    {q:"What did Job's wife tell him?", a:"'Do you still hold fast to your integrity? Curse God and die!'"},
-    {q:"How did Job answer his wife?", a:"'You speak as one of the foolish women would speak. Shall we receive good from God, and shall we not receive evil?' — In all this Job did not sin with his lips."},
+  "Book of Job (Detailed)": [
+    {q:"How is Job described at the opening of the book?", a:"'Blameless and upright, one who feared God and turned away from evil.' He was the greatest of all the people of the east."},
+    {q:"How many children did Job have?", a:"Seven sons and three daughters (symbolizing completeness)."},
+    {q:"What was Job's initial wealth?", a:"7,000 sheep, 3,000 camels, 500 yoke of oxen, 500 she-asses, and very many servants."},
+    {q:"What did Job do after his sons held feasts?", a:"He sent for them to sanctify them, rose early, and offered burnt offerings for each — saying 'It may be that my sons have sinned and cursed God in their hearts.' He even sacrificed for sins of thought."},
+    {q:"What is the 'divine council' scene?", a:"The sons of God (heavenly beings) present themselves before the LORD, and Satan (the Accuser/Adversary) comes among them. He functions as a prosecuting attorney in the divine court."},
+    {q:"What did God say to Satan about Job?", a:"'Have you considered my servant Job, that there is none like him on the earth, a blameless and upright man, who fears God and turns away from evil?'"},
+    {q:"What was Satan's challenge to God?", a:"'Does Job fear God for nought? You have blessed the work of his hands... Put forth your hand now, and touch all that he has, and he will curse you to your face.' — Job's faith was transactional, not genuine."},
+    {q:"What was the first wager?", a:"God gave Satan power over all Job's possessions but forbade touching Job himself."},
+    {q:"Who brought the four messages of disaster?", a:"Four messengers, each arriving while the previous was still speaking."},
+    {q:"What did the first messenger report?", a:"The Sabeans fell upon the oxen and asses, took them, and slew the servants."},
+    {q:"What did the second messenger report?", a:"The fire of God fell from heaven and burned up the sheep and the servants."},
+    {q:"What did the third messenger report?", a:"The Chaldeans formed three companies, raided the camels, and slew the servants."},
+    {q:"What did the fourth messenger report?", a:"A great wind came across the wilderness, struck the four corners of the house, and it fell on the young people — all ten children died."},
+    {q:"How did Job respond to the first wave of disasters?", a:"He arose, rent his robe, shaved his head, fell upon the ground, and worshiped: 'Naked I came from my mother's womb, and naked shall I return; the LORD gave, and the LORD has taken away; blessed be the name of the LORD.' He did not sin or charge God with wrong."},
+    {q:"What was the second wager?", a:"Satan said: 'Skin for skin! All that a man has he will give for his life. Touch his bone and his flesh, and he will curse you to your face.' God permitted it but forbade death."},
+    {q:"How was Job afflicted in the second test?", a:"With loathsome sores (boils) from the sole of his foot to the crown of his head. He sat among the ashes, scraping himself with a potsherd."},
+    {q:"What did Job's wife say to him?", a:"'Do you still hold fast your integrity? Curse God, and die.' (The Hebrew literally says 'bless God' — a euphemism for cursing, a bitter irony.)"},
+    {q:"How did Job answer his wife?", a:"'You speak as one of the foolish women would speak. Shall we receive good at the hand of God, and shall we not receive evil?' He did not sin with his lips."},
     {q:"Who were Job's three friends?", a:"Eliphaz the Temanite, Bildad the Shuhite, and Zophar the Naamathite."},
-    {q:"How long did Job's friends sit with him in silence?", a:"Seven days and seven nights, because they saw his suffering was very great."},
-    {q:"What did Bildad compare Job's children to?", a:"Death."},
-    {q:"What did Job call his friends?", a:"'Miserable comforters.'"},
-    {q:"How did God speak to Job?", a:"Through a whirlwind."},
-    {q:"What key statement does Job make in Job 42:2?", a:"'I know that you can do all things, and that no purpose of yours can be thwarted.'"},
-    {q:"When did God restore Job's fortunes?", a:"After Job prayed for his friends."},
-    {q:"What was Job's wealth after restoration?", a:"14,000 sheep, 6,000 camels, 1,000 yoke of oxen, and 1,000 female donkeys — double his original wealth."},
-    {q:"What were the names of Job's daughters after his restoration?", a:"Jemimah, Keziah, and Keren-Happuch — the most beautiful women in all the land."},
-    {q:"What unusual thing did Job do for his daughters?", a:"He gave them an inheritance along with their brothers."},
-    {q:"How long did Job live after his restoration?", a:"140 more years; he saw four generations of descendants and died old and full of days."},
-    {q:"Who did God rebuke at the end of the book?", a:"Job's three friends — they had defended God but spoken falsely about Him."},
-    {q:"What is the main theme of the Book of Job?", a:"Theodicy — why good people suffer; faith and steadfastness in the midst of suffering."},
-    {q:"What did Job value more than anything else?", a:"The word of God."},
-    {q:"What is the main idea about living in the midst of struggles?", a:"Never lose faith in your ability to overcome it."}
+    {q:"What did the friends do when they first saw Job?", a:"They did not recognize him, raised their voices and wept, rent their robes, sprinkled dust on their heads, and sat with him on the ground for seven days and seven nights without speaking a word."},
+    {q:"What did Job do in Chapter 3?", a:"He cursed the day of his birth, called for darkness to swallow it, longed for death, and asked why life is given to those in misery. He did not curse God directly."},
+    {q:"What was Eliphaz's main argument?", a:"The innocent do not perish; those who plow iniquity reap the same. If Job is suffering, he must have sinned. He claimed a night vision revealed that no mortal can be righteous before God."},
+    {q:"What was Bildad's main argument?", a:"God does not pervert justice. Job's children died for their transgression. If Job repents, God will restore him. He appealed to the wisdom of the ancients."},
+    {q:"What was Zophar's main argument?", a:"Job is full of talk and should be shamed. God exacts less than Job's guilt deserves — Job is getting off easy. He urged Job to repent."},
+    {q:"How did Job respond to his friends' arguments?", a:"With raw honesty and sarcasm: 'No doubt you are the people, and wisdom will die with you.' He maintained his innocence and longed for a mediator between himself and God."},
+    {q:"What did Job call his friends?", a:"'Miserable comforters' — 'Shall windy words have an end?' He said they were like a treacherous torrent-bed, offering no real help."},
+    {q:"What important declaration does Job make in Job 19:25-27?", a:"'For I know that my Redeemer lives, and at last he will stand upon the earth; and after my skin has been thus destroyed, yet in my flesh I shall see God.' — A hope that a Vindicator will stand up for him."},
+    {q:"How does Job challenge the friends' theology in Chapter 21?", a:"'Why do the wicked live, reach old age, and grow mighty in power?' He points out that wicked people often prosper, contradicting the retributive justice principle."},
+    {q:"What false accusations does Eliphaz make in Chapter 22?", a:"That Job exacted pledges from brothers, stripped the naked, withheld water from the weary, and withheld bread from the hungry."},
+    {q:"What does Job long for in Chapter 23?", a:"'Oh, that I knew where I might find him, that I might come even to his seat! I would lay my case before him.' But God is hidden — 'I go forward, but he is not there.'"},
+    {q:"What is Job's Oath of Innocence in Chapter 31?", a:"A list of sins he has NOT committed: falsehood, adultery, injustice to servants, neglect of the poor, greed, idolatry, vindictiveness, inhospitality. He signs his defense and demands the Almighty answer."},
+    {q:"Who is Elihu, and what is his perspective?", a:"A young man, son of Barachel the Buzite, who was angry at Job and the three friends. He argued: 1) Suffering is God's discipline. 2) God's justice is beyond human understanding. 3) Humans should not demand explanations from God."},
+    {q:"How does God answer Job?", a:"Out of the whirlwind. God does not answer Job's questions directly but asks a torrent of rhetorical questions demonstrating divine wisdom and human limitation."},
+    {q:"What are some of God's questions about creation?", a:"'Where were you when I laid the foundation of the earth? Who shut in the sea with doors? Have you commanded the morning? Have you entered the storehouses of the snow? Can you bind the chains of the Pleiades?'"},
+    {q:"What animals does God ask about in Chapter 39?", a:"Mountain goats, wild ass, wild ox, ostrich, horse, hawk, and eagle — demonstrating God's wisdom encompasses all creation."},
+    {q:"How does Job respond to God's first speech?", a:"'Behold, I am of small account; what shall I answer thee? I lay my hand on my mouth. I have spoken once, and I will not answer; twice, but I will proceed no further.'"},
+    {q:"What does God say about Behemoth?", a:"A fearsome creature made by God, with bones like tubes of bronze and limbs like bars of iron — 'the first of the works of God.' Humans cannot control it."},
+    {q:"What does God say about Leviathan?", a:"A fearsome creature of chaos that cannot be tamed by humans but is part of God's creation. God's point: if Job cannot control these creatures, how can he judge God's governance?"},
+    {q:"What is Job's final response to God?", a:"'I know that thou canst do all things... I have uttered what I did not understand... I had heard of thee by the hearing of the ear, but now my eye sees thee; therefore I despise myself, and repent in dust and ashes.'"},
+    {q:"How does God judge the three friends?", a:"'My wrath is kindled against you... for you have not spoken of me what is right, as my servant Job has.' He ordered them to offer seven bulls and seven rams, and Job prayed for them."},
+    {q:"How was Job restored?", a:"When he prayed for his friends, the LORD restored his fortunes and gave him twice as much as before: 14,000 sheep, 6,000 camels, 1,000 yoke of oxen, 1,000 she-asses."},
+    {q:"What were the names of Job's three daughters?", a:"Jemimah ('dove'), Keziah ('cassia' or 'cinnamon'), and Keren-happuch ('horn of eye-paint'). They were the most beautiful women in all the land."},
+    {q:"What unusual thing did Job do for his daughters?", a:"He gave them an inheritance among their brothers — normally daughters did not inherit."},
+    {q:"How long did Job live after his restoration?", a:"140 years. He saw his sons, and his sons' sons, four generations. He died an old man, full of days."},
+    {q:"What are the central themes of the Book of Job?", a:"1) The problem of innocent suffering. 2) The limits of human wisdom. 3) The nature of true faith (not transactional). 4) The danger of theological arrogance. 5) The possibility of encounter with God. 6) The vindication of the sufferer."}
   ],
 
-  "Oedipus Rex": [
-    {q:"Who wrote Oedipus Rex?", a:"Sophocles (c. 496–406 BCE), one of classical Athens' three great tragic playwrights."},
-    {q:"What does the name 'Oedipus' mean?", a:"'Swollen foot.'"},
-    {q:"What is the Latin title, and what does Tyrannos mean?", a:"Oedipus Tyrannos — 'Tyrannos' signifies the throne was not gained through inheritance."},
-    {q:"When and where was Oedipus Rex performed?", a:"5th century BCE; first runner-up in 429 BC at the festival of Dionysus in Athens, Greece."},
-    {q:"What is the cause of the plague in Thebes?", a:"The undiscovered murderer of the old king, Laius, who must be exiled."},
-    {q:"Where was Oedipus left for dead as a baby?", a:"On Mount Cithaeon."},
-    {q:"Who reveals the truth to Oedipus?", a:"Tiresias, the blind prophet — he knows the true nature of Oedipus."},
-    {q:"Why does Jocasta try to stop Oedipus from speaking to the shepherd?", a:"Because she already knew the truth and knew Oedipus would be destroyed."},
-    {q:"What punishment does Oedipus receive?", a:"He blinds himself and exiles himself."},
+  "Oedipus Rex (Detailed)": [
+    {q:"Who wrote Oedipus Rex, and when?", a:"Sophocles, around 429 BCE. It was first runner-up at the festival of Dionysus in Athens."},
+    {q:"What was the curse on Laius?", a:"Laius had wronged Pelops, son of King Tantalus. Pelops cursed Laius: if he ever had a son, that son would kill him."},
+    {q:"What did the Delphic Oracle tell Laius?", a:"His son would kill him and marry his own mother."},
+    {q:"Why was Oedipus abandoned as a baby?", a:"Laius pierced the infant's ankles (Oedipus means 'swollen foot') and gave him to a shepherd to expose on Mount Cithaeron."},
+    {q:"How was Oedipus saved?", a:"The shepherd pitied the child and gave him to another shepherd from Corinth, who brought him to King Polybus and Queen Merope, who raised him as their own."},
+    {q:"What did the Oracle tell Oedipus as a young man?", a:"That he was fated to kill his father and marry his mother. Horrified, he fled Corinth."},
+    {q:"What happened at the crossroads?", a:"Oedipus encountered Laius in a chariot. Laius tried to push him off the road. Oedipus, in a rage, killed Laius and his servants — not knowing Laius was his father."},
+    {q:"What was the Sphinx, and what was her riddle?", a:"A monster with a woman's head, lion's body, and eagle's wings. Her riddle: 'What walks on four legs in the morning, two legs at noon, and three legs in the evening?'"},
+    {q:"How did Oedipus solve the Sphinx's riddle?", a:"He answered 'Man' — who crawls as a baby, walks upright as an adult, and uses a cane in old age. The Sphinx killed herself."},
+    {q:"What happened after Oedipus saved Thebes?", a:"He was made king and married the widowed queen, Jocasta — not knowing she was his mother. They had four children: Eteocles, Polynices, Antigone, and Ismene."},
+    {q:"What is the situation at the opening of the play?", a:"A plague has struck Thebes. Citizens gather at the altars with suppliant branches, led by a priest of Zeus, seeking divine aid."},
+    {q:"What does the priest say about the plague?", a:"'A blight is on the fruitful plants of the earth... a deadly pestilence is on our town... the house of Cadmus is emptied of its people while black Death grows rich in groaning and lamentation.'"},
+    {q:"What action has Oedipus already taken?", a:"He has sent Creon, his brother-in-law, to the Delphic Oracle to learn how the city might be saved."},
+    {q:"What does Creon report from the Oracle?", a:"The murderer of Laius must be found and punished. Only then will the plague be lifted."},
+    {q:"What did the survivor of Laius's attack claim?", a:"That robbers — many men — killed Laius at a crossroads."},
+    {q:"Why was the murder not investigated at the time?", a:"The Sphinx was terrorizing the city, and all attention was focused on solving her riddle."},
+    {q:"What does Oedipus vow?", a:"'I will bring this to light again... I will be an ally, a champion of my country and the God.'"},
+    {q:"Who is Tiresias?", a:"A blind prophet who is said to see more than any sighted person. He is reluctant to reveal what he knows."},
+    {q:"What does Tiresias finally reveal?", a:"'I say you are the murderer of the king whose murderer you seek.'"},
+    {q:"How does Oedipus react to Tiresias?", a:"With outrage. He accuses Tiresias and Creon of plotting to seize power, mocks Tiresias's blindness, and boasts of solving the Sphinx's riddle by his own wit."},
+    {q:"What is Tiresias's devastating prophecy?", a:"'You have your eyes but see not where you are in sin... You are an enemy to kith and kin... A deadly footed, double striking curse shall drive you forth... He shall be proved father and brother both to his own children; to her that gave him birth, a son and husband both.'"},
+    {q:"What does Oedipus accuse Creon of?", a:"Conspiracy — plotting with Tiresias to seize power."},
+    {q:"How does Creon defend himself?", a:"'May I die accursed, if I have been guilty of one tittle of the charge you bring against me!' He argues logically and refuses to be provoked."},
+    {q:"Who intervenes in the quarrel?", a:"Jocasta, Oedipus's wife and Creon's sister, who tries to make peace."},
+    {q:"How does Jocasta try to comfort Oedipus?", a:"By dismissing prophecy: 'Human beings have no part in the craft of prophecy.' She tells him the oracle about Laius was false — Laius was killed by robbers, not by his son."},
+    {q:"What details of Laius's death alarm Oedipus?", a:"The murder happened at a crossroads in Phocis; Laius was tall with grizzled hair; there were five people including a herald and one carriage."},
+    {q:"What is Oedipus's story about his past?", a:"Polybus was his father, Merope his mother. A drunk accused him of being a bastard. He went to Delphi and was told he would kill his father and marry his mother. He fled Corinth to avoid this fate."},
+    {q:"What happened at the crossroads according to Oedipus?", a:"He was encountered by a herald and a carriage. The old man struck him on the head with a goad. Oedipus became angry and killed them all."},
+    {q:"What hope remains for Oedipus?", a:"The survivor said robbers — many men — killed Laius. If there were many killers, Oedipus could not be the murderer."},
+    {q:"Who arrives from Corinth, and what news?", a:"A messenger arrives with news that Polybus is dead. Jocasta is overjoyed, thinking the prophecy is proven false."},
+    {q:"What does the messenger reveal?", a:"That Polybus was not Oedipus's biological father. The messenger himself gave Oedipus to Polybus as a gift. Oedipus was found on Cithaeron's slopes."},
+    {q:"What evidence of Oedipus's identity does the messenger cite?", a:"The scars on Oedipus's ankles — the tendons of his feet were pierced and fettered, which is why he is called Oedipus ('swollen foot')."},
+    {q:"What does Jocasta realize?", a:"She realizes the truth before Oedipus does. She begs him: 'I beg you — do not hunt this out — I beg you, if you have any care for your own life.'"},
+    {q:"How does Oedipus misunderstand Jocasta's plea?", a:"He thinks she is ashamed of his low birth: 'Keep up your heart, Jocasta. Though I'm proved a slave, thrice slave, you'll not be shown to be of lowly lineage.'"},
+    {q:"What does Jocasta cry out before running into the palace?", a:"'O Oedipus, God help you! God keep you from the knowledge of who you are!'"},
+    {q:"Who is brought forward to testify?", a:"The old herdsman — the same man who was the survivor of Laius's attack."},
+    {q:"What does the herdsman finally reveal?", a:"He gave the child to the messenger. The child was from the house of Laius. Jocasta gave him the child to 'make away with it' through fear of evil oracles. He pitied the child and gave it to the messenger."},
+    {q:"What does Oedipus cry out when the truth is complete?", a:"'O, O, O, they will all come, all come out clearly! Light of the sun, let me look upon you no more after today! I who first saw the light bred of a match accursed... cursed in my killing.'"},
+    {q:"How does Jocasta die?", a:"She hangs herself in the marriage bed, tearing her hair and cursing the bed where she brought forth husband by her husband, children by her own child."},
+    {q:"How does Oedipus blind himself?", a:"He tore the gold brooches from Jocasta's robe and dashed them on his own eyeballs, shrieking that they would never see the crime he had committed. He struck again and again until the bleeding eyeballs gushed."},
+    {q:"What does Oedipus say about his blinding?", a:"'It was Apollo, friends, Apollo, that brought this bitter bitterness. But the hand that struck me was none but my own. Why should I see whose vision showed me nothing sweet to see?'"},
     {q:"Who becomes ruler of Thebes at the end?", a:"Creon, Jocasta's brother."},
-    {q:"How does Jocasta die?", a:"She hangs herself."},
-    {q:"What is Oedipus' tragic flaw?", a:"Arrogance (also described as impulsiveness)."},
-    {q:"What is hamartia?", a:"The hero's flaw that leads to his tragic downfall."},
+    {q:"What does Oedipus ask Creon to do?", a:"Drive him out of Thebes; let him live on Mount Cithaeron where he should have died as a child. He also asks Creon to bury Jocasta and protect his daughters, Antigone and Ismene."},
+    {q:"What does Oedipus say about his daughters?", a:"'I weep for you — I cannot see your faces... who will marry you? No one, my children; clearly you are doomed to waste away in barrenness unmarried.'"},
+    {q:"What are the central themes of Oedipus Rex?", a:"1) Fate vs. free will. 2) Blindness vs. sight (Tiresias blind but sees truth; Oedipus sighted but blind to truth). 3) Hubris (pride). 4) The quest for truth. 5) The limits of human intelligence. 6) The tragic hero. 7) Guilt and innocence."},
+    {q:"What is the famous final line of the play?", a:"'Count no man happy until he has passed beyond life's final day.'"}
+  ],
+
+  "Greek Tragedy Terms": [
+    {q:"What is hamartia?", a:"The hero's flaw that leads to his tragic downfall — a personal error or decision, not an accident."},
     {q:"What is hubris?", a:"The hero's arrogance or excessive pride — a disrespect for the natural order of the world."},
-    {q:"What is peripeteia?", a:"The hero's experience of a reversal of fate or fortune."},
-    {q:"What is anagnorisis?", a:"A pivotal moment in which the hero reaches an important realization."},
-    {q:"What is nemesis?", a:"The unavoidable fate of the hero, usually caused by his own hubris — literally 'revenge.'"},
-    {q:"What is catharsis?", a:"The audience's release of negative emotions such as pity and fear toward the end of the play."},
+    {q:"What is peripeteia?", a:"The reversal of fate or fortune — the hero's experience of a complete reversal."},
+    {q:"What is anagnorisis?", a:"The pivotal moment in which the hero reaches a realization or important discovery."},
+    {q:"What is nemesis?", a:"The unavoidable fate of the hero, usually caused by his own hubris — literally 'revenge' or cosmic payback."},
+    {q:"What is catharsis?", a:"The audience's release of negative emotions such as pity and fear toward the end of the play — a purification or purging."},
     {q:"What are the six elements of a tragedy?", a:"Plot, Characters, Thought, Diction, Song, and Spectacle."},
-    {q:"Which element is the 'soul of tragedy'?", a:"Plot — the most important element, where the arrangement of incidents and actions exists."},
-    {q:"What is the prologue?", a:"The opening monologue or dialogue before the entrance of the chorus; presents the background."},
-    {q:"What is the parados?", a:"The entrance of the chorus through expressive songs and dances that leads to the main theme."},
+    {q:"Which element is the 'soul of tragedy'?", a:"Plot — the most important element where the arrangement of incidents and actions exists."},
+    {q:"What is the prologue?", a:"The opening monologue or dialogue before the entrance of the chorus; presents the background of the play."},
+    {q:"What is the parados?", a:"The entrance of the chorus through expressive songs and dances that leads up to the main theme."},
+    {q:"What is an episode?", a:"The central part of the play where the chorus and actors interact through dialogues. Typically 3-5 episodes."},
     {q:"What is a stasimon?", a:"The section where the chorus gives comment or reaction to the episodes."},
     {q:"What is the exodus?", a:"The concluding part of the play and the final song of the chorus where the moral is revealed."},
-    {q:"Who are Oedipus' four children?", a:"Sons Eteocles and Polynices; daughters Antigone and Ismene."},
-    {q:"Who is Antigone?", a:"Oedipus' daughter who guides her blind father in exile and later defies Creon to bury her brother Polynices."},
-    {q:"What is a major irony in the play?", a:"Oedipus vows to find Laius' murderer but he is the murderer; Tiresias is blind yet sees the truth, while sighted Oedipus is blind to it."},
-    {q:"What does the play suggest about truth?", a:"Knowing the truth results in painful consequences."},
-    {q:"What three principles define a Greek tragedy?", a:"1) It evokes pity and fear. 2) The tragic hero must be essentially admirable and good. 3) The hero's demise comes from personal error or decision."}
+    {q:"What are the three principles of a Greek tragedy?", a:"1) It should evoke pity and fear. 2) The tragic hero must be essentially admirable and good. 3) The hero's demise must come from personal error or decision."},
+    {q:"What is the difference between simple and complex plot?", a:"Simple — consists of 'change of fortune' (catastrophe). Complex — involves both 'plot reversal' (peripeteia) and 'tragic recognition' (anagnorisis)."}
+  ],
+
+  "Gilgamesh & Job Comparisons": [
+    {q:"How does the Gilgamesh flood compare to Noah's flood?", a:"Both feature: divine decision to flood; a chosen survivor warned; a boat; birds sent out (dove, swallow, raven vs. dove, raven); a sacrifice; gods who regret. Gilgamesh's is older (Sumerian)."},
+    {q:"What do Gilgamesh and Job have in common?", a:"Both are righteous/good men who suffer greatly. Both question the gods/God. Both receive a form of restoration. Both explore the meaning of suffering."},
+    {q:"How do Gilgamesh and Job differ in their responses to suffering?", a:"Gilgamesh grieves and seeks immortality. Job grieves and demands an explanation. Gilgamesh learns to accept mortality. Job learns humility and encounters God."},
+    {q:"What is theodicy?", a:"The question of why a good God permits suffering — a central theme in the Book of Job."},
+    {q:"What is the key difference between Gilgamesh's and Job's endings?", a:"Gilgamesh returns to Uruk with wisdom and accepts mortality. Job is restored with double wealth and lives 140 more years."},
+    {q:"How are both stories similar in their view of the divine?", a:"Both show gods/God as powerful and beyond human understanding. Both show that humans cannot fully comprehend divine purposes."}
   ],
 
   "Business & Resume": [
     {q:"What is a business letter?", a:"A formal correspondence serving as written communication among customers, clients, stakeholders, investors, and other commercial purposes."},
     {q:"What are the seven parts of a business letter?", a:"Heading, Date Line, Inside Address, Salutation, Body, Complimentary Close, and Signature."},
-    {q:"What are the optional parts of a business letter?", a:"Attention line, Subject or Reference line, and Enclosures."},
     {q:"What are the four business letter styles?", a:"Full Block, Modified Block, Semi-Block, and Simplified."},
-    {q:"Describe the Full Block style.", a:"Every component in the format is aligned to the left. It is the most popular because of its simplicity."},
+    {q:"Describe the Full Block style.", a:"Every component is aligned to the left. It is the most popular because of its simplicity."},
     {q:"Describe the Modified Block style.", a:"The date line, complimentary close, and signature are typed at the right side of the page."},
-    {q:"Describe the Semi-Block style.", a:"All elements are left-aligned, except the beginning of each paragraph, which is indented. Ideal for handwritten letters."},
-    {q:"Describe the Simplified style.", a:"Similar to full block, but the salutation and complimentary close are omitted; the writer's name and title are typed in all caps."},
-    {q:"Resume vs. Curriculum Vitae?", a:"Resume — concise (1–2 pages) of experiences, education, and skills. CV ('course life') — in-depth (2+ pages) covering career path, distinctions, publications, awards; static."},
+    {q:"Resume vs. CV?", a:"Resume — concise (1-2 pages) of experiences, education, and skills. CV ('course life') — in-depth (2+ pages) covering career path, distinctions, publications, awards; static."},
     {q:"What are the three resume formats?", a:"Chronological, Functional, and Combination (Hybrid)."},
     {q:"When should you use the chronological format?", a:"When demonstrating career progress, showing little work experience gaps, or applying for related work."},
-    {q:"When should you NOT use the chronological format?", a:"With multiple gaps in employment, career shifts into a new industry, or recurring job changes."},
-    {q:"When is the functional format best?", a:"For students with fewer work experiences but relevant skills, career shifts, or multiple gaps — it presents skills over dates."},
-    {q:"What is the combination format?", a:"It combines functional skill categories with dated employment history; focuses on skills and experience without hiding employment history."},
+    {q:"When is the functional format best?", a:"For students with fewer work experiences but relevant skills, career shifts, or multiple gaps."},
     {q:"What are the parts of an email?", a:"Sender (From), Recipient (To), Subject Line, Salutation, Body, Attachment, and Closing."},
-    {q:"What does Cc stand for?", a:"Carbon copy — allows recipients to see other recipients who received a copy of the same email."},
-    {q:"What does Bcc stand for?", a:"Blind carbon copy — prevents recipients from knowing the other recipients of the email."},
-    {q:"What does P.S. stand for?", a:"Postscript — an additional remark other than the message in the body of the letter."},
-    {q:"What are the four body-structure paragraphs of an application letter?", a:"Opening (position + how you learned of it), Second (interest + relevant skills), Third (why you're the best fit + refer to resume), Closing (gratitude + contact details)."},
-    {q:"Hard skills vs. Soft skills?", a:"Hard skills — abilities acquired through life experience and training (technical tasks). Soft skills — natural personal traits (integrity, teamwork, adaptability)."},
-    {q:"What is ZIP?", a:"Zone Improvement Plan — four digits assigned to a locality that help post office personnel sort and distribute letters."},
-    {q:"What are the six common types of email?", a:"Transactional, Marketing, Apology, Announcement, Invitation, and Request."},
-    {q:"What are the resume guidelines?", a:"Length (1–2 pages), compelling content, professional appearance, readable fonts (10–12 pt), consistent format, editing, accuracy, skills matter, and formal language."}
+    {q:"What does Cc stand for?", a:"Carbon copy — allows recipients to see other recipients who received a copy."},
+    {q:"What does Bcc stand for?", a:"Blind carbon copy — prevents recipients from knowing other recipients."},
+    {q:"What does P.S. stand for?", a:"Postscript — an additional remark other than the message in the body."},
+    {q:"What are the four body paragraphs of an application letter?", a:"Opening (position + how you learned of it), Second (interest + skills), Third (why best fit + refer to resume), Closing (gratitude + contact details)."},
+    {q:"Hard skills vs. Soft skills?", a:"Hard skills — abilities acquired through training (technical). Soft skills — natural personal traits (integrity, teamwork, adaptability)."}
   ]
 };
 
 /* =========================================================
-   QUIZ QUESTIONS
+   QUIZ QUESTIONS — DETAILED
    ========================================================= */
 const QUIZ = [
-  /* --- LITERATURE --- */
-  {t:"Literature", q:"What does the Latin word littera mean?", o:["Story","Letter","Song","Book"], c:1,
-   e:"Literature comes from the Latin word littera, which means 'letter.'"},
+  /* GILGAMESH */
+  {t:"Gilgamesh", q:"Who were Gilgamesh's parents?", o:["Ninsun and Lugalbanda","Ishtar and Anu","Aruru and Enlil","Siduri and Utnapishtim"], c:0,
+   e:"His mother was the goddess Ninsun; his father was the mortal king Lugalbanda. He was two-thirds divine and one-third human."},
 
-  {t:"Literature", q:"Which form of literature is considered the oldest?", o:["Prose","Drama","Poetry","Media"], c:2,
-   e:"Poetry is the oldest form — it existed through songs and spoken narratives even before writing."},
+  {t:"Gilgamesh", q:"Who created Enkidu, and from what?", o:["Enlil, from fire","Aruru, from clay","Ea, from water","Shamash, from light"], c:1,
+   e:"Aruru, the goddess of creation, fashioned Enkidu from clay as a wild man."},
 
-  {t:"Literature", q:"Which literary form is a self-written life story?", o:["Biography","Memoir","Autobiography","Essay"], c:2,
-   e:"An autobiography is a self-written life story; a biography is written by someone else."},
+  {t:"Gilgamesh", q:"Who was Shamhat?", o:["A goddess of love","A temple prostitute sent to civilize Enkidu","A boatman","Utnapishtim's wife"], c:1,
+   e:"Shamhat was a temple prostitute (hierodule/sacred servant of Ishtar) sent by Gilgamesh to civilize Enkidu."},
 
-  {t:"Literature", q:"A five-line poem that conveys a vivid image is called a:", o:["Haiku","Cinquain","Sonnet","Ballad"], c:1,
-   e:"A cinquain derives its name from its structure — it consists of five lines."},
+  {t:"Gilgamesh", q:"What happened to Enkidu after six days and seven nights with Shamhat?", o:["He became king","The wild animals fled from him; he gained understanding and wisdom","He lost his strength entirely","He returned to the wilderness forever"], c:1,
+   e:"The wild animals fled from him; he could no longer run with the gazelles; but he gained understanding, wisdom, and capacity for human connection."},
 
-  {t:"Literature", q:"Which essay type uses adjectives and figures of speech to create a mental image?", o:["Expository","Persuasive","Descriptive","Critical"], c:2,
-   e:"A descriptive essay uses adjectives, simile, and metaphor to give readers a mental image of the subject."},
+  {t:"Gilgamesh", q:"How did the wrestling match between Gilgamesh and Enkidu end?", o:["Gilgamesh won","Enkidu won","It ended in a draw; they became friends","They killed each other"], c:2,
+   e:"Neither could gain advantage — they were perfectly matched. They embraced and became inseparable friends."},
 
-  {t:"Literature", q:"A haiku follows which syllable count?", o:["7-5-7","5-7-5","5-5-5","7-7-7"], c:1,
-   e:"A haiku has three lines following a 5-7-5 syllable count, usually about nature."},
+  {t:"Gilgamesh", q:"Who adopted Enkidu, making him and Gilgamesh brothers?", o:["Ishtar","Shamhat","Ninsun","Siduri"], c:2,
+   e:"Ninsun, Gilgamesh's mother, adopted Enkidu as her own son."},
 
-  /* --- MYTHOLOGY --- */
-  {t:"Mythology", q:"The word 'myth' is derived from the Greek word mythos, which means:", o:["God","Story or tale","Truth","Legend"], c:1,
-   e:"Mythos means 'story' or 'tale.' A myth is an ancient narrative explaining natural events or origins."},
+  {t:"Gilgamesh", q:"Who was Humbaba?", o:["A god of the underworld","A monster appointed by Enlil to guard the Cedar Forest","A boatman","The first king of Uruk"], c:1,
+   e:"Humbaba was a fearsome monster appointed by Enlil to guard the Cedar Forest. His voice was thunder, his breath fire, his presence caused paralysis and death."},
 
-  {t:"Mythology", q:"Which type of myth explains the origin of a place, object, or concept?", o:["Historical","Psychological","Etiological","Religious"], c:2,
-   e:"Etiological myths come from the Greek word for 'reason' and explain origins."},
+  {t:"Gilgamesh", q:"Who helped Gilgamesh and Enkidu in the battle against Humbaba?", o:["Ishtar","Shamash sent thirteen winds","Anu","Ea"], c:1,
+   e:"Shamash, the sun god, sent thirteen winds to blind and confuse Humbaba."},
 
-  {t:"Mythology", q:"Who wrote Theogony around 700 BC?", o:["Homer","Sophocles","Hesiod","Apollodorus"], c:2,
-   e:"Hesiod wrote Theogony to explain the identities and alliances of the gods."},
+  {t:"Gilgamesh", q:"What did Humbaba do before he died?", o:["He blessed Gilgamesh","He cursed Enkidu, saying he would not live long","He promised to serve Ishtar","He revealed the secret of immortality"], c:1,
+   e:"Humbaba cursed Enkidu before he died, saying Enkidu would not live long after this deed."},
 
-  {t:"Mythology", q:"How was Athena born?", o:["From the sea foam","From Zeus' forehead","From Gaea's tears","From a golden egg"], c:1,
-   e:"Zeus swallowed Metis; Athena emerged fully grown and dressed for war from Zeus' forehead."},
+  {t:"Gilgamesh", q:"Who proposed marriage to Gilgamesh after his return?", o:["Shamhat","Ninsun","Ishtar","Siduri"], c:2,
+   e:"Ishtar, the goddess of love and war, proposed marriage to Gilgamesh."},
 
-  {t:"Mythology", q:"Who was punished by having a vulture peck out his liver every day?", o:["Atlas","Prometheus","Epimetheus","Cronus"], c:1,
-   e:"Prometheus gave fire to mankind and was chained to a mountain as punishment."},
+  {t:"Gilgamesh", q:"How did Gilgamesh reject Ishtar?", o:["Politely declining","With a blistering insult reciting her destroyed lovers","By ignoring her","By offering her gold"], c:1,
+   e:"He recited her former lovers and how she destroyed each: Tammuz, the lion, the horse, the shepherd, the gardener."},
 
-  {t:"Mythology", q:"Which god is associated with the trident and horses?", o:["Zeus","Hades","Ares","Poseidon"], c:3,
-   e:"Poseidon is the god of the sea, floods, drought, and horses; his symbol is the trident."},
+  {t:"Gilgamesh", q:"What did Ishtar demand from Anu?", o:["The Cedar Forest","The Bull of Heaven","Eternal life","The throne of Uruk"], c:1,
+   e:"She demanded the Bull of Heaven to punish Gilgamesh, threatening to release the dead if refused."},
 
-  {t:"Mythology", q:"What did Pandora release when she opened the box?", o:["Only hope","Only evils","All evils, but also hope","Wealth and power"], c:2,
-   e:"Pain, sickness, envy, greed, and other horrors flew out — but so did hope."},
+  {t:"Gilgamesh", q:"How was the Bull of Heaven killed?", o:["Shamash struck it with lightning","Enkidu grabbed it by the horns, Gilgamesh drove his sword into its neck","It was drowned in the Euphrates","Ishtar killed it herself"], c:1,
+   e:"Enkidu grabbed it by the horns; Gilgamesh drove his sword into its neck. They cut out its heart and offered it to Shamash."},
 
-  /* --- ARCHETYPES --- */
-  {t:"Archetypes", q:"Who introduced the concept of the 'collective unconscious'?", o:["Sigmund Freud","Carl Jung","Joseph Campbell","Aristotle"], c:1,
-   e:"Carl Jung explained that humans have a 'collective unconscious' — shared likes, dislikes, and expectations about stories."},
+  {t:"Gilgamesh", q:"What did the divine council decide after the killings of Humbaba and the Bull?", o:["Both heroes should die","Enkidu must die, Gilgamesh spared","Gilgamesh must die, Enkidu spared","Both heroes should be rewarded"], c:1,
+   e:"Enlil argued Enkidu must die, but Gilgamesh should be spared. Shamash protested, but Enlil was adamant."},
 
-  {t:"Archetypes", q:"Which archetype is a normal person facing extraordinary circumstances who simply wants to survive?", o:["Hero","Antihero","Everyman","Trickster"], c:2,
-   e:"The Everyman does not feel obligated to save the world — he or she simply wants to survive a crisis."},
+  {t:"Gilgamesh", q:"How long did Gilgamesh refuse to bury Enkidu?", o:["Three days","Seven days and seven nights","Twelve days","One month"], c:1,
+   e:"He refused to allow anyone to bury his friend for seven days and seven nights."},
 
-  {t:"Archetypes", q:"Wolverine, who has heroic attributes but is gruff and unpleasant, is an example of which archetype?", o:["Villain","Antihero","Trickster","Everyman"], c:1,
-   e:"The antihero has several attributes of a hero but is not as conventionally 'good.'"},
+  {t:"Gilgamesh", q:"Who was Utnapishtim?", o:["The king of Uruk","The only mortal granted immortality","A boatman","The god of wisdom"], c:1,
+   e:"Utnapishtim was the only mortal granted immortality by the gods."},
 
-  {t:"Archetypes", q:"Which situational archetype is shown in The Lion King?", o:["Rags to Riches","Journeys","Death and Rebirth","Good vs. Evil"], c:2,
-   e:"The Lion King depicts a cub's baptism, an adult lion's death, and the cub growing up to lead."},
+  {t:"Gilgamesh", q:"Who was Siduri?", o:["A goddess of love","A divine tavern keeper by the sea","Utnapishtim's wife","The boatman's sister"], c:1,
+   e:"Siduri was a divine tavern keeper who gave Gilgamesh advice about accepting mortality."},
 
-  /* --- GILGAMESH --- */
-  {t:"Gilgamesh", q:"What city did Gilgamesh rule?", o:["Uz","Urshanabi","Uruk","Unapishtim"], c:2,
-   e:"Gilgamesh was the legendary King of Uruk, who ruled around 2700 BC."},
+  {t:"Gilgamesh", q:"What advice did Siduri give Gilgamesh?", o:["Seek immortality at all costs","Fill your belly with good things; day and night, dance and be merry","Pray to Ishtar for forgiveness","Return to Uruk immediately"], c:1,
+   e:"She told him: 'When the gods created man, they allotted to him death, but life they retained. Fill your belly with good things; day and night, dance and be merry... for this too is the lot of man.'"},
 
-  {t:"Gilgamesh", q:"Who was the hairy wild man who lived in the wilderness?", o:["Gilgamesh","Anu","Enkidu","Utnapishtim"], c:2,
-   e:"Enkidu was created by the gods to challenge Gilgamesh; they later became close friends."},
+  {t:"Gilgamesh", q:"Who was Urshanabi?", o:["The king of Shurrupak","The boatman of Utnapishtim","A scorpion-man","The god of the sea"], c:1,
+   e:"Urshanabi was the boatman of Utnapishtim who ferried Gilgamesh across the waters of death."},
 
-  {t:"Gilgamesh", q:"What word best describes Gilgamesh at the start of the epic?", o:["Benevolent","Tyrannical","Humble","Cunning"], c:1,
-   e:"Gilgamesh began as a cruel and arrogant ruler who abused the people of Uruk."},
+  {t:"Gilgamesh", q:"Why did the gods decide to send the flood?", o:["Human wickedness","The world had become too noisy — the clamor disturbed the gods' sleep","Humans stopped sacrificing","The gods were bored"], c:1,
+   e:"The world had become too noisy — the clamor of humans disturbed the gods' sleep. Enlil convinced the council."},
 
-  {t:"Gilgamesh", q:"Where did Enkidu and Gilgamesh travel to fight the monster Humbaba?", o:["City of Babylon","Dry Desert","Euphrates River","Cedar Forest"], c:3,
-   e:"They journeyed to the Cedar Forest to fight the monster Humbaba."},
+  {t:"Gilgamesh", q:"How did Ea warn Utnapishtim?", o:["Through a dream","By whispering through the walls of his reed house","By sending a messenger","Through a burning bush"], c:1,
+   e:"He whispered the secret through the walls of Utnapishtim's reed house: 'Reed-house, reed-house! Wall, O wall... tear down your house and build a boat.'"},
 
-  {t:"Gilgamesh", q:"Why did the gods allow Enkidu to challenge Gilgamesh?", o:["They were following a prophecy","They wanted Gilgamesh replaced","Gilgamesh abused the people of Uruk","Gilgamesh thought he was stronger than the gods"], c:2,
-   e:"The people of Uruk complained to the gods about Gilgamesh's tyranny, so Enkidu was created."},
+  {t:"Gilgamesh", q:"What were the dimensions of Utnapishtim's boat?", o:["A perfect cube, 120 cubits each side, seven decks","A sphere, 100 cubits","A rectangle, 200 by 100 cubits","A pyramid, 150 cubits"], c:0,
+   e:"A perfect cube, each side 120 cubits (approximately 180 feet), with seven decks, divided into nine sections."},
 
-  {t:"Gilgamesh", q:"What did Gilgamesh decide to do after Enkidu's death?", o:["Discover the secret of immortality","Surrender his throne","Become King of his own city","Curse Ishtar"], c:0,
-   e:"Grieving Enkidu's death, Gilgamesh resolved to find the secret of immortality."},
+  {t:"Gilgamesh", q:"What three birds did Utnapishtim send out?", o:["Dove, swallow, raven","Dove, raven, eagle","Swallow, hawk, raven","Dove, sparrow, eagle"], c:0,
+   e:"Dove (returned), swallow (returned), raven (did not return — waters had retreated)."},
 
-  {t:"Gilgamesh", q:"What two secrets did Utnapishtim reveal to Gilgamesh?", o:["The secret of gold and the secret of war","The gods' plan to flood humanity and the secret of immortality","The location of Humbaba and the way to Uruk","The names of the gods and the date of the flood"], c:1,
-   e:"Utnapishtim revealed the gods' plan to destroy humanity by flood, and the secret of immortality granted to him."},
+  {t:"Gilgamesh", q:"What did Enlil do when he saw Utnapishtim had survived?", o:["He rejoiced","He was furious and asked how any mortal escaped","He killed Utnapishtim","He flooded the world again"], c:1,
+   e:"He was furious: 'Has any of these mortals escaped? Not one was to have survived the destruction.'"},
 
-  {t:"Gilgamesh", q:"What did Gilgamesh ultimately learn about eternal life?", o:["It can be earned through heroism","It belongs only to kings","It is the lasting legacy of one's works","It is found in the Cedar Forest"], c:2,
-   e:"Gilgamesh abandoned his quest and realized true immortality is the lasting legacy of one's accomplishments."},
+  {t:"Gilgamesh", q:"What reward did Enlil give Utnapishtim?", o:["Gold and silver","Immortality at the mouth of the rivers","Kingship of Shurrupak","A new boat"], c:1,
+   e:"Enlil blessed Utnapishtim and his wife: 'Henceforth he and his wife shall live in the distance at the mouth of the rivers.' They were granted immortality."},
 
-  {t:"Gilgamesh", q:"Who rediscovered a complete version of the Epic of Gilgamesh in 1839?", o:["Heinrich Schliemann","Arthur Evans","Austen Layard","Shin-Leqi-Unninni"], c:2,
-   e:"British archaeologist Austen Layard found it in Nineveh, in the library of Ashurbanipal."},
+  {t:"Gilgamesh", q:"What test did Utnapishtim give Gilgamesh?", o:["To fight a lion","To prevail against sleep for six days and seven nights","To swim across the sea","To climb a mountain"], c:1,
+   e:"Gilgamesh immediately fell asleep. Utnapishtim's wife baked a loaf each day and marked the wall."},
 
-  /* --- BOOK OF JOB --- */
-  {t:"Book of Job", q:"Where was the author of the Book of Job from?", o:["Uruk","Uz","Ur","Nineveh"], c:1,
-   e:"The anonymous non-Israelite author came from the land of Uz, southeast of ancient Israel."},
+  {t:"Gilgamesh", q:"What secret plant did Utnapishtim reveal?", o:["A plant that grants immortality","A plant that restores lost youth","A plant that heals all wounds","A plant that gives strength"], c:1,
+   e:"A plant that grows under the water, with a prickle like a thorn, that restores lost youth — not immortality, but renewal."},
 
-  {t:"Book of Job", q:"How many sons and daughters did Job originally have?", o:["Three sons and three daughters","Seven sons and three daughters","Ten sons and two daughters","Seven sons and seven daughters"], c:1,
-   e:"Job had seven sons and three daughters before his trials (Job 1:2)."},
+  {t:"Gilgamesh", q:"What happened to the youth-restoring plant?", o:["Gilgamesh ate it","A serpent snatched it and sloughed its skin","Urshanabi stole it","It withered and died"], c:1,
+   e:"While Gilgamesh bathed, a serpent sensed the sweetness, rose from the water, snatched the plant, and immediately sloughed its skin."},
 
-  {t:"Book of Job", q:"How many sheep did Job own at the beginning?", o:["3,000","7,000","500","14,000"], c:1,
-   e:"Job owned 7,000 sheep, along with 3,000 camels, 500 yoke of oxen, and 500 female donkeys."},
+  {t:"Gilgamesh", q:"What did Gilgamesh learn about immortality?", o:["It can be achieved through heroism","It belongs only to kings","True immortality is the lasting legacy of one's works","It is found in the Cedar Forest"], c:2,
+   e:"True immortality is not living forever but the lasting legacy of one's works — the walls of Uruk, the city, the story itself."},
 
-  {t:"Book of Job", q:"How many camels did Job own initially?", o:["500","1,000","3,000","6,000"], c:2,
-   e:"Job had 3,000 camels — long-distance freight carriers that enabled commerce over desert routes."},
+  /* BOOK OF JOB */
+  {t:"Book of Job", q:"How is Job described at the opening?", o:["Rich and powerful","Blameless and upright, fearing God and turning from evil","Wise and learned","Strong and mighty"], c:1,
+   e:"'Blameless and upright, one who feared God and turned away from evil.' He was the greatest of all the people of the east."},
 
-  {t:"Book of Job", q:"How many yoke of oxen did Job own at the start?", o:["500","1,000","3,000","7,000"], c:0,
-   e:"Job had 500 yoke of oxen (approximately 1,000 animals), indicating large-scale agriculture."},
+  {t:"Book of Job", q:"What was Job's initial wealth?", o:["1,000 sheep, 500 camels","7,000 sheep, 3,000 camels, 500 yoke oxen, 500 she-asses","3,000 sheep, 1,000 camels","14,000 sheep, 6,000 camels"], c:1,
+   e:"7,000 sheep, 3,000 camels, 500 yoke of oxen, 500 she-asses, and very many servants."},
 
-  {t:"Book of Job", q:"What was Job's status among the people of the East?", o:["A minor shepherd","A wandering prophet","The greatest man among all the people of the East","A forgotten exile"], c:2,
-   e:"Job 1:3 describes him as 'the greatest man among all the people of the East.'"},
+  {t:"Book of Job", q:"What did Job do after his sons held feasts?", o:["He joined them","He offered burnt offerings for each, in case they sinned in their hearts","He ignored them","He punished them"], c:1,
+   e:"He sent for them to sanctify them, rose early, and offered burnt offerings for each — even for sins of thought."},
 
-  {t:"Book of Job", q:"How did Satan torment Job's body?", o:["Fever","Boils","Deafness","Blindness"], c:1,
-   e:"Satan afflicted Job with severe boils from the soles of his feet to the crown of his head."},
+  {t:"Book of Job", q:"What is the 'divine council' scene?", o:["A meeting of angels","The sons of God present themselves before the LORD, and Satan comes among them","A council of priests","A gathering of prophets"], c:1,
+   e:"The sons of God (heavenly beings) present themselves before the LORD, and Satan (the Accuser) comes among them."},
 
-  {t:"Book of Job", q:"What did Job's wife tell him to do?", o:["Pray for healing","Curse God and die","Flee to another land","Blame his friends"], c:1,
-   e:"His wife said, 'Do you still hold fast to your integrity? Curse God and die!'"},
+  {t:"Book of Job", q:"What was Satan's challenge to God?", o:["Job is too strong","Job only serves God because God rewards him; take away the rewards and he will curse God","Job is secretly wicked","Job does not pray enough"], c:1,
+   e:"'Does Job fear God for nought? You have blessed the work of his hands... Put forth your hand now, and touch all that he has, and he will curse you to your face.'"},
 
-  {t:"Book of Job", q:"How did Job respond when he lost his livestock, servants, and children?", o:["He cursed God","He worshipped God","He doubted God","He blamed his wife"], c:1,
-   e:"Job tore his robe, shaved his head, fell to the ground and worshipped, saying 'The Lord gave, and the Lord has taken away.'"},
+  {t:"Book of Job", q:"What was the first wager?", o:["God gave Satan power over all Job's possessions but forbade touching Job himself","God gave Satan power over Job's body","God gave Satan power over Job's family only","God gave Satan nothing"], c:0,
+   e:"God gave Satan power over all Job's possessions but forbade touching Job himself."},
 
-  {t:"Book of Job", q:"How long did Job's friends sit with him on the ground without speaking?", o:["3 days","5 days","7 days","9 days"], c:2,
-   e:"They sat with him seven days and seven nights, for they saw his suffering was very great."},
+  {t:"Book of Job", q:"What did the first messenger report?", o:["The Sabeans stole the oxen and asses and slew the servants","Fire burned the sheep","Chaldeans stole the camels","A wind killed the children"], c:0,
+   e:"The Sabeans fell upon the oxen and asses, took them, and slew the servants."},
 
-  {t:"Book of Job", q:"What did Bildad compare Job's children to?", o:["Wisdom","Diamonds","Death","Strength"], c:2,
-   e:"Bildad compared Job's children to death, suggesting they died because of sin."},
+  {t:"Book of Job", q:"What did the second messenger report?", o:["The Sabeans stole the oxen","The fire of God fell from heaven and burned the sheep and servants","Chaldeans stole the camels","A wind killed the children"], c:1,
+   e:"The fire of God fell from heaven and burned up the sheep and the servants."},
 
-  {t:"Book of Job", q:"How did God speak to Job?", o:["Through a prophecy","Through a nightmare","Through a flowing river","Through a whirlwind"], c:3,
-   e:"God answered Job out of the whirlwind, humbling him by showing His power."},
+  {t:"Book of Job", q:"What did the fourth messenger report?", o:["The Sabeans stole the oxen","Fire burned the sheep","Chaldeans stole the camels","A great wind collapsed the house, killing all ten children"], c:3,
+   e:"A great wind came across the wilderness, struck the four corners of the house, and it fell on the young people — all ten children died."},
 
-  {t:"Book of Job", q:"When did God restore Job's fortunes?", o:["When he fasted","When he acknowledged God's power","When he prayed for his friends","When he revered all his good acts"], c:2,
-   e:"After Job prayed for his friends, the Lord restored his fortunes and doubled all he had."},
+  {t:"Book of Job", q:"How did Job respond to the first wave of disasters?", o:["He cursed God","He rent his robe, shaved his head, fell on the ground and worshiped","He questioned God","He fell silent"], c:1,
+   e:"He arose, rent his robe, shaved his head, fell upon the ground, and worshiped: 'The LORD gave, and the LORD has taken away; blessed be the name of the LORD.'"},
 
-  {t:"Book of Job", q:"How many sheep did Job have after his restoration?", o:["7,000","10,000","14,000","21,000"], c:2,
-   e:"Job's restored wealth was double: 14,000 sheep, 6,000 camels, 1,000 yoke of oxen, 1,000 female donkeys."},
+  {t:"Book of Job", q:"What was the second wager?", o:["Satan said: 'Skin for skin! Touch his bone and his flesh, and he will curse you'","Satan said: 'Take his family'","Satan said: 'Take his wealth'","Satan said: 'Give him more wealth'"], c:0,
+   e:"Satan said: 'Skin for skin! All that a man has he will give for his life. Touch his bone and his flesh, and he will curse you to your face.'"},
 
-  {t:"Book of Job", q:"What were the names of Job's three daughters after his restoration?", o:["Jemimah, Keziah, and Keren-Happuch","Sarah, Rebekah, and Rachel","Mary, Martha, and Elizabeth","Dinah, Tamar, and Ruth"], c:0,
-   e:"Job named them Jemimah, Keziah, and Keren-Happuch — the most beautiful women in all the land."},
+  {t:"Book of Job", q:"How was Job afflicted in the second test?", o:["With fever","With boils from the sole of his foot to the crown of his head","With blindness","With paralysis"], c:1,
+   e:"He was afflicted with loathsome sores (boils) from the sole of his foot to the crown of his head. He sat among the ashes, scraping himself with a potsherd."},
 
-  {t:"Book of Job", q:"What unusual thing did Job do for his daughters?", o:["Made them priestesses","Gave them an inheritance along with their brothers","Sent them to another land","Married them to kings"], c:1,
-   e:"Job gave his daughters an inheritance along with their brothers — unusual for that time."},
+  {t:"Book of Job", q:"What did Job's wife say to him?", o:["Pray for healing","Curse God and die","Flee to another land","Blame his friends"], c:1,
+   e:"'Do you still hold fast your integrity? Curse God, and die.' (The Hebrew says 'bless God' — a euphemism for cursing.)"},
+
+  {t:"Book of Job", q:"How did Job answer his wife?", o:["He agreed with her","'Shall we receive good at the hand of God, and shall we not receive evil?'","He ignored her","He wept"], c:1,
+   e:"'You speak as one of the foolish women would speak. Shall we receive good at the hand of God, and shall we not receive evil?' He did not sin with his lips."},
+
+  {t:"Book of Job", q:"Who were Job's three friends?", o:["Eliphaz, Bildad, and Zophar","Elihu, Eliphaz, and Bildad","Eliphaz, Elihu, and Zophar","Bildad, Zophar, and Elihu"], c:0,
+   e:"Eliphaz the Temanite, Bildad the Shuhite, and Zophar the Naamathite."},
+
+  {t:"Book of Job", q:"What did the friends do when they first saw Job?", o:["They immediately spoke","They sat with him on the ground for seven days and seven nights without speaking","They left","They sang hymns"], c:1,
+   e:"They did not recognize him, wept, rent their robes, sprinkled dust, and sat with him for seven days and seven nights without speaking a word."},
+
+  {t:"Book of Job", q:"What did Job do in Chapter 3?", o:["He cursed God","He cursed the day of his birth and longed for death","He prayed for healing","He asked for forgiveness"], c:1,
+   e:"He cursed the day of his birth, called for darkness to swallow it, longed for death, and asked why life is given to those in misery."},
+
+  {t:"Book of Job", q:"What was Eliphaz's main argument?", o:["The innocent do not perish; if Job suffers, he must have sinned","Job should be patient","God is unjust","Suffering is random"], c:0,
+   e:"Eliphaz argued that the innocent do not perish; those who plow iniquity reap the same. He claimed a night vision revealed no mortal can be righteous before God."},
+
+  {t:"Book of Job", q:"What did Job call his friends?", o:["Faithful companions","Miserable comforters","Wise counselors","Holy men"], c:1,
+   e:"'Miserable comforters are you all.' He said they were like a treacherous torrent-bed, offering no real help."},
+
+  {t:"Book of Job", q:"What important declaration does Job make in Job 19:25-27?", o:["'I know that my Redeemer lives'","'I will never speak again'","'God is unjust'","'I have sinned'"], c:0,
+   e:"'For I know that my Redeemer lives, and at last he will stand upon the earth; and after my skin has been thus destroyed, yet in my flesh I shall see God.'"},
+
+  {t:"Book of Job", q:"Who is Elihu?", o:["A fourth friend who was older","A young man who was angry at Job and the three friends","Job's brother","A prophet"], c:1,
+   e:"Elihu, son of Barachel the Buzite, was a young man who argued suffering is God's discipline and God's justice is beyond human understanding."},
+
+  {t:"Book of Job", q:"How does God answer Job?", o:["Through a dream","Out of the whirlwind","Through an angel","Through a prophet"], c:1,
+   e:"God answered Job out of the whirlwind, asking a torrent of rhetorical questions demonstrating divine wisdom and human limitation."},
+
+  {t:"Book of Job", q:"What are some of God's questions about creation?", o:["'Where were you when I laid the foundation of the earth?'","'Why did you sin?'","'Do you love me?'","'Will you obey me?'"], c:0,
+   e:"'Where were you when I laid the foundation of the earth? Who shut in the sea with doors? Have you commanded the morning? Can you bind the chains of the Pleiades?'"},
+
+  {t:"Book of Job", q:"How does Job respond to God's first speech?", o:["He argues back","He lays his hand on his mouth and says he will proceed no further","He flees","He laughs"], c:1,
+   e:"'Behold, I am of small account; what shall I answer thee? I lay my hand on my mouth. I have spoken once, and I will not answer; twice, but I will proceed no further.'"},
+
+  {t:"Book of Job", q:"What is Job's final response to God?", o:["'I have sinned greatly'","'I had heard of thee by the hearing of the ear, but now my eye sees thee; therefore I despise myself, and repent in dust and ashes'","'You are unjust'","'I will never speak again'"], c:1,
+   e:"'I know that thou canst do all things... I have uttered what I did not understand... I had heard of thee by the hearing of the ear, but now my eye sees thee; therefore I despise myself, and repent in dust and ashes.'"},
+
+  {t:"Book of Job", q:"How does God judge the three friends?", o:["He praises them","'You have not spoken of me what is right, as my servant Job has'","He ignores them","He strikes them dead"], c:1,
+   e:"God's wrath was kindled against them. He ordered them to offer seven bulls and rams, and Job prayed for them."},
+
+  {t:"Book of Job", q:"How was Job restored?", o:["He was given back exactly what he lost","He was given twice as much as before","He was given half as much","He was not restored"], c:1,
+   e:"When he prayed for his friends, the LORD restored his fortunes and gave him twice as much: 14,000 sheep, 6,000 camels, 1,000 yoke of oxen, 1,000 she-asses."},
+
+  {t:"Book of Job", q:"What were the names of Job's three daughters?", o:["Jemimah, Keziah, and Keren-happuch","Sarah, Rebekah, and Rachel","Mary, Martha, and Elizabeth","Dinah, Tamar, and Ruth"], c:0,
+   e:"Jemimah ('dove'), Keziah ('cassia'), and Keren-happuch ('horn of eye-paint'). They were the most beautiful women in all the land."},
+
+  {t:"Book of Job", q:"What unusual thing did Job do for his daughters?", o:["Made them priestesses","Gave them an inheritance among their brothers","Sent them to another land","Married them to kings"], c:1,
+   e:"He gave them an inheritance among their brothers — normally daughters did not inherit."},
 
   {t:"Book of Job", q:"How long did Job live after his restoration?", o:["40 years","70 years","100 years","140 years"], c:3,
-   e:"Job lived 140 more years and saw four generations of descendants."},
+   e:"Job lived 140 years and saw four generations of descendants. He died an old man, full of days."},
 
-  {t:"Book of Job", q:"What is the main idea of the Book of Job regarding struggles?", o:["Life is a series of ups and downs","The comfort of friends is what we need","Never lose faith in your ability to overcome it","Use the experience to be stronger in the future"], c:2,
-   e:"The selection's main idea is to never lose faith in your ability to overcome struggles."},
+  /* OEDIPUS REX */
+  {t:"Oedipus Rex", q:"Who wrote Oedipus Rex, and when?", o:["Aristotle, 400 BCE","Sophocles, around 429 BCE","Euripides, 450 BCE","Aeschylus, 500 BCE"], c:1,
+   e:"Sophocles wrote Oedipus Rex around 429 BCE. It was first runner-up at the festival of Dionysus."},
 
-  {t:"Book of Job", q:"Who did God rebuke at the end of the book?", o:["Job","Job's wife","Job's three friends","Satan"], c:2,
-   e:"God turned on the friends who had defended God throughout the book but spoken falsely about Him."},
+  {t:"Oedipus Rex", q:"What was the curse on Laius?", o:["His son would kill him and marry his mother","He would lose his throne","He would die childless","His city would be destroyed"], c:0,
+   e:"Pelops cursed Laius: if he ever had a son, that son would kill him. The Delphic Oracle confirmed the son would kill him and marry his mother."},
 
-  /* --- OEDIPUS --- */
-  {t:"Oedipus Rex", q:"What does the name 'Oedipus' mean?", o:["Ultimate king","Unknown destiny","Swollen foot","Bequeath throne"], c:2,
-   e:"Oedipus comes from the Greek word 'Oidipous,' which means 'swollen foot.'"},
+  {t:"Oedipus Rex", q:"Why was Oedipus abandoned as a baby?", o:["He was sickly","Laius pierced his ankles and gave him to a shepherd to expose on Mount Cithaeron","His mother rejected him","The gods demanded it"], c:1,
+   e:"Laius pierced the infant's ankles (Oedipus means 'swollen foot') and gave him to a shepherd to expose on Mount Cithaeron."},
 
-  {t:"Oedipus Rex", q:"What is the cause of the plague in Thebes?", o:["The excessive pride of the gods","A conspiracy against Oedipus","The undiscovered murderer of the old king","The effects of the Sphinx's riddle"], c:2,
-   e:"The plague will only be lifted if the murderer of King Laius is exiled."},
+  {t:"Oedipus Rex", q:"How was Oedipus saved?", o:["A god rescued him","The shepherd pitied him and gave him to another shepherd from Corinth","He was found by travelers","He crawled to safety"], c:1,
+   e:"The shepherd pitied the child and gave him to another shepherd from Corinth, who brought him to King Polybus and Queen Merope."},
 
-  {t:"Oedipus Rex", q:"Where did Oedipus' biological parents leave him for dead?", o:["Colonus","Cithaeon","Thebes","Corinth"], c:1,
-   e:"Oedipus was abandoned on Mount Cithaeon with his ankles pinned together."},
+  {t:"Oedipus Rex", q:"What did the Oracle tell Oedipus as a young man?", o:["He would become king","He would kill his father and marry his mother","He would die young","He would be exiled"], c:1,
+   e:"The Oracle told him he was fated to kill his father and marry his mother. Horrified, he fled Corinth."},
 
-  {t:"Oedipus Rex", q:"Why does Jocasta attempt to stop Oedipus from speaking to the shepherd?", o:["She does not want to know the truth","She does not want to offend the oracle","She accepts the predestined fate of Thebes","She already knew the truth and knew Oedipus would be destroyed"], c:3,
-   e:"Jocasta had already realized the truth and knew it would destroy Oedipus."},
+  {t:"Oedipus Rex", q:"What happened at the crossroads?", o:["Oedipus met his mother","Oedipus killed Laius and his servants in a rage","Oedipus was robbed","Oedipus met Tiresias"], c:1,
+   e:"Laius tried to push Oedipus off the road. Oedipus, in a rage, killed Laius and his servants — not knowing Laius was his father."},
 
-  {t:"Oedipus Rex", q:"What punishment does Oedipus receive?", o:["Death","Exile","Disability","Dethronement"], c:1,
-   e:"Oedipus blinds himself and exiles himself from Thebes."},
+  {t:"Oedipus Rex", q:"What was the Sphinx's riddle?", o:["What walks on four legs in the morning, two legs at noon, and three legs in the evening?","What is the meaning of life?","What is the strongest thing in the world?","What has four legs but cannot walk?"], c:0,
+   e:"Oedipus answered 'Man' — who crawls as a baby, walks upright as an adult, and uses a cane in old age."},
 
-  {t:"Oedipus Rex", q:"Who became the ruler of Thebes at the end of the play?", o:["Tiresias","Eteocles","Polynices","Creon"], c:3,
+  {t:"Oedipus Rex", q:"What happened after Oedipus saved Thebes?", o:["He was made king and married the widowed queen, Jocasta","He was exiled","He was made a god","He left Thebes"], c:0,
+   e:"He was made king and married the widowed queen, Jocasta — not knowing she was his mother."},
+
+  {t:"Oedipus Rex", q:"What is the situation at the opening of the play?", o:["A plague has struck Thebes","A war is raging","A famine has struck","The Sphinx has returned"], c:0,
+   e:"A plague has struck Thebes. Citizens gather at the altars with suppliant branches, led by a priest of Zeus."},
+
+  {t:"Oedipus Rex", q:"What does Creon report from the Oracle?", o:["The murderer of Laius must be found and punished","The city must be abandoned","The gods are angry","A sacrifice is needed"], c:0,
+   e:"The murderer of Laius must be found and punished. Only then will the plague be lifted."},
+
+  {t:"Oedipus Rex", q:"Who is Tiresias?", o:["A blind prophet who sees more than any sighted person","A king","A messenger","A shepherd"], c:0,
+   e:"Tiresias is a blind prophet who is said to see more than any sighted person."},
+
+  {t:"Oedipus Rex", q:"What does Tiresias finally reveal?", o:["'You are the murderer of the king whose murderer you seek'","'The plague will end soon'","'Creon is the murderer'","'Jocasta is the murderer'"], c:0,
+   e:"'I say you are the murderer of the king whose murderer you seek.'"},
+
+  {t:"Oedipus Rex", q:"What is Tiresias's devastating prophecy?", o:["Oedipus will become a god","Oedipus will be proved father and brother to his own children, son and husband to his mother","Oedipus will die in battle","Oedipus will be exiled but return"], c:1,
+   e:"'You have your eyes but see not where you are in sin... He shall be proved father and brother both to his own children; to her that gave him birth, a son and husband both.'"},
+
+  {t:"Oedipus Rex", q:"How does Jocasta try to comfort Oedipus?", o:["By telling him to pray","By dismissing prophecy as false","By telling him to leave Thebes","By blaming Creon"], c:1,
+   e:"She tells him the oracle about Laius was false — Laius was killed by robbers, not by his son. She says: 'Human beings have no part in the craft of prophecy.'"},
+
+  {t:"Oedipus Rex", q:"What details of Laius's death alarm Oedipus?", o:["The murder happened at a crossroads; Laius was tall with grizzled hair; there were five people and one carriage","The murder happened in Thebes","Laius was killed by a friend","Laius was poisoned"], c:0,
+   e:"The murder happened at a crossroads in Phocis; Laius was tall with grizzled hair; there were five people including a herald and one carriage."},
+
+  {t:"Oedipus Rex", q:"What is Oedipus's story about his past?", o:["He was raised in Thebes","Polybus was his father, Merope his mother; a drunk accused him of being a bastard; the Oracle told him he would kill his father and marry his mother","He was raised by wolves","He was always an orphan"], c:1,
+   e:"Polybus was his father, Merope his mother. A drunk accused him of being a bastard. He went to Delphi and was told he would kill his father and marry his mother."},
+
+  {t:"Oedipus Rex", q:"Who arrives from Corinth, and what news?", o:["A messenger with news that Polybus is dead","A soldier with news of war","A shepherd with news of Laius","A priest with news of the gods"], c:0,
+   e:"A messenger arrives with news that Polybus is dead. Jocasta is overjoyed, thinking the prophecy is proven false."},
+
+  {t:"Oedipus Rex", q:"What does the messenger reveal?", o:["That Polybus was not Oedipus's biological father","That Jocasta is Oedipus's mother","That Laius is alive","That Tiresias is a fraud"], c:0,
+   e:"The messenger reveals that Polybus was not Oedipus's biological father. The messenger himself gave Oedipus to Polybus as a gift."},
+
+  {t:"Oedipus Rex", q:"What evidence of Oedipus's identity does the messenger cite?", o:["A birthmark","The scars on Oedipus's ankles","A ring","A letter"], c:1,
+   e:"The scars on Oedipus's ankles — the tendons of his feet were pierced and fettered, which is why he is called Oedipus ('swollen foot')."},
+
+  {t:"Oedipus Rex", q:"What does Jocasta cry out before running into the palace?", o:["'O Oedipus, God help you! God keep you from the knowledge of who you are!'","'I will kill myself'","'You are not my son'","'I will leave you'"], c:0,
+   e:"'O Oedipus, God help you! God keep you from the knowledge of who you are!'"},
+
+  {t:"Oedipus Rex", q:"What does the herdsman finally reveal?", o:["That Jocasta gave him the child to 'make away with it' through fear of evil oracles","That Laius killed the child","That the child died","That the child was given to a god"], c:0,
+   e:"Jocasta gave him the child to 'make away with it' through fear of evil oracles. He pitied the child and gave it to the messenger."},
+
+  {t:"Oedipus Rex", q:"How does Jocasta die?", o:["She is killed by Creon","She hangs herself in the marriage bed","She drinks poison","She is struck by a god"], c:1,
+   e:"She hangs herself in the marriage bed, tearing her hair and cursing the bed where she brought forth husband by her husband, children by her own child."},
+
+  {t:"Oedipus Rex", q:"How does Oedipus blind himself?", o:["With a sword","With the gold brooches from Jocasta's robe","With a stone","With fire"], c:1,
+   e:"He tore the gold brooches from Jocasta's robe and dashed them on his own eyeballs, shrieking that they would never see the crime he had committed."},
+
+  {t:"Oedipus Rex", q:"What does Oedipus say about his blinding?", o:["'It was Apollo, friends, Apollo, that brought this bitter bitterness. But the hand that struck me was none but my own.'","'The gods blinded me'","'I was cursed from birth'","'I deserve worse'"], c:0,
+   e:"'It was Apollo, friends, Apollo, that brought this bitter bitterness. But the hand that struck me was none but my own. Why should I see whose vision showed me nothing sweet to see?'"},
+
+  {t:"Oedipus Rex", q:"Who becomes ruler of Thebes at the end?", o:["Tiresias","Creon","Eteocles","Polynices"], c:1,
    e:"Creon, Jocasta's brother, becomes ruler of Thebes at the end."},
 
-  {t:"Oedipus Rex", q:"Which character represented the truth in the selection?", o:["Creon","Tiresias","Jocasta","Laius"], c:1,
-   e:"Tiresias is blind yet he knows the true nature of Oedipus — he represents truth."},
+  {t:"Oedipus Rex", q:"What does Oedipus ask Creon to do?", o:["Kill him","Drive him out of Thebes; let him live on Mount Cithaeron","Make him a god","Restore his sight"], c:1,
+   e:"He asks Creon to drive him out of Thebes; let him live on Mount Cithaeron where he should have died as a child."},
 
-  {t:"Oedipus Rex", q:"What is Oedipus' tragic flaw?", o:["Arrogance","Ambition","Passion","Greed"], c:0,
-   e:"Oedipus' tragic flaw is his arrogance (hubris), which drives his downfall."},
+  {t:"Oedipus Rex", q:"What are the central themes of Oedipus Rex?", o:["Fate vs. free will; blindness vs. sight; hubris; the quest for truth","Love and marriage","War and peace","Wealth and poverty"], c:0,
+   e:"1) Fate vs. free will. 2) Blindness vs. sight (Tiresias blind but sees truth; Oedipus sighted but blind). 3) Hubris. 4) The quest for truth. 5) The limits of human intelligence. 6) The tragic hero. 7) Guilt and innocence."},
 
-  {t:"Oedipus Rex", q:"What truth about life does the play suggest?", o:["Forgiveness gives you a chance to discover what you deserve","Deception loses your inner core and desire for truth","Knowing the truth results in painful consequences","Being courageous comes with great freedom and potential"], c:2,
-   e:"The play suggests that knowing the truth results in painful consequences."},
+  {t:"Oedipus Rex", q:"What is the famous final line of the play?", o:["'Count no man happy until he has passed beyond life's final day.'","'The gods are cruel.'","'Fate is unavoidable.'","'Knowledge is pain.'"], c:0,
+   e:"'Count no man happy until he has passed beyond life's final day.'"},
 
-  {t:"Oedipus Rex", q:"Who were Oedipus' four children?", o:["Eteocles, Polynices, Antigone, and Ismene","Creon, Jocasta, Laius, and Tiresias","Antigone, Ismene, Haemon, and Creon","Polynices, Haemon, Antigone, and Jocasta"], c:0,
-   e:"Oedipus and Jocasta had two sons (Eteocles, Polynices) and two daughters (Antigone, Ismene)."},
-
-  /* --- GREEK TRAGEDY --- */
-  {t:"Greek Tragedy", q:"Which element is considered the 'soul of tragedy'?", o:["Characters","Plot","Diction","Spectacle"], c:1,
-   e:"Plot is the most important element — the soul of tragedy where the arrangement of incidents and actions exists."},
-
-  {t:"Greek Tragedy", q:"What is hamartia?", o:["The hero's arrogance","The reversal of fate","The hero's flaw that leads to his downfall","The audience's release of emotion"], c:2,
-   e:"Hamartia is the hero's fatal flaw that causes the tragedy to happen."},
+  /* GREEK TRAGEDY TERMS */
+  {t:"Greek Tragedy", q:"What is hamartia?", o:["The hero's arrogance","The hero's flaw that leads to his tragic downfall","The reversal of fate","The audience's release of emotion"], c:1,
+   e:"Hamartia is the hero's flaw that leads to his tragic downfall — a personal error or decision, not an accident."},
 
   {t:"Greek Tragedy", q:"What is anagnorisis?", o:["The hero's excessive pride","The pivotal moment of realization","The unavoidable fate of the hero","The choice of words"], c:1,
-   e:"Anagnorisis is the pivotal moment in which the hero reaches a realization."},
+   e:"Anagnorisis is the pivotal moment in which the hero reaches a realization or important discovery."},
 
   {t:"Greek Tragedy", q:"What is catharsis?", o:["The hero's downfall","The audience's release of pity and fear","The reversal of fortune","The chorus's final song"], c:1,
    e:"Catharsis is the purification or purging of feelings that Aristotle believed was the purpose of tragedy."},
 
-  {t:"Greek Tragedy", q:"Which section of a Greek play contains the final song where the moral is revealed?", o:["Prologue","Parados","Stasimon","Exodus"], c:3,
-   e:"The exodus is the concluding part of the play and the final song of the chorus."},
+  {t:"Greek Tragedy", q:"Which element is considered the 'soul of tragedy'?", o:["Characters","Plot","Diction","Spectacle"], c:1,
+   e:"Plot is the most important element — the soul of tragedy where the arrangement of incidents and actions exists."},
 
-  {t:"Greek Tragedy", q:"According to Aristotle, the tragic hero must be:", o:["Perfect and flawless","Essentially admirable and good","Evil and cruel","Ordinary and unremarkable"], c:1,
-   e:"Audiences relate more to the 'good guys,' which is why tragedies ask, 'Why do bad things happen to good people?'"},
+  {t:"Greek Tragedy", q:"What is the exodus?", o:["The opening monologue","The entrance of the chorus","The concluding part where the moral is revealed","The central dialogue"], c:2,
+   e:"The exodus is the concluding part of the play and the final song of the chorus where the moral is revealed."},
 
-  {t:"Greek Tragedy", q:"Which playwright wrote Oedipus Rex?", o:["Aeschylus","Euripides","Sophocles","Aristophanes"], c:2,
-   e:"Sophocles wrote Oedipus Rex, which was first runner-up at the 429 BC festival of Dionysus."},
+  /* BUSINESS */
+  {t:"Business", q:"What are the seven parts of a business letter?", o:["Heading, Date, Inside Address, Salutation, Body, Complimentary Close, Signature","Date, Heading, Salutation, Body, Signature, Closing, Address","Salutation, Heading, Body, Date, Closing, Signature, Address","Inside Address, Heading, Salutation, Date, Body, Signature, Closing"], c:0,
+   e:"Heading, Date Line, Inside Address, Salutation, Body, Complimentary Close, and Signature."},
 
-  /* --- BUSINESS / RESUME --- */
-  {t:"Business Writing", q:"What is the standard order of parts in a business letter?", o:["Salutation, Heading, Body, Date, Closing, Signature","Heading, Date, Inside Address, Salutation, Body, Complimentary Close, Signature","Date, Salutation, Heading, Body, Signature, Closing","Inside Address, Heading, Salutation, Date, Body, Signature"], c:1,
-   e:"The standard order is Heading, Date Line, Inside Address, Salutation, Body, Complimentary Close, and Signature."},
-
-  {t:"Business Writing", q:"In which letter style is every component aligned to the left?", o:["Modified Block","Semi-Block","Full Block","Simplified"], c:2,
-   e:"In Full Block style, every component is aligned to the left — it is the most popular because of its simplicity."},
-
-  {t:"Business Writing", q:"Which letter style omits the salutation and complimentary close?", o:["Full Block","Semi-Block","Simplified","Modified Block"], c:2,
-   e:"The Simplified style is like full block except the salutation and complimentary close are omitted, and the writer's name and title are in all caps."},
-
-  {t:"Business Writing", q:"Which resume format focuses on skills over dates and is ideal for students with fewer work experiences?", o:["Chronological","Functional","Combination","Hybrid"], c:1,
+  {t:"Business", q:"Which resume format is best for students with fewer work experiences?", o:["Chronological","Functional","Combination","Simplified"], c:1,
    e:"The functional format presents skills and qualifications over experiences without revealing dates."},
 
-  {t:"Business Writing", q:"Which resume format is recommended for those with steady employment history?", o:["Functional","Chronological","Combination","Simplified"], c:1,
-   e:"Chronological is recommended for those with working experience or a steady employment history."},
-
-  {t:"Business Writing", q:"What does Bcc stand for in an email?", o:["Blind carbon copy","Basic carbon copy","Blind courtesy copy","Business copy"], c:0,
+  {t:"Business", q:"What does Bcc stand for?", o:["Blind carbon copy","Basic carbon copy","Blind courtesy copy","Business copy"], c:0,
    e:"Bcc (blind carbon copy) prevents recipients from knowing the other recipients of the email."},
 
-  {t:"Business Writing", q:"What is the difference between a resume and a CV?", o:["A resume is longer than a CV","A CV is always one page","A CV is an in-depth document over two or more pages; a resume is concise","They are exactly the same"], c:2,
-   e:"A CV ('course life') is an in-depth document over two or more pages; a resume is concise (1–2 pages)."},
-
-  {t:"Business Writing", q:"Which type of email is used to acknowledge a mistake and ask for forgiveness?", o:["Transactional","Marketing","Apology","Announcement"], c:2,
-   e:"An apology email acknowledges a mistake or shortcoming, expresses regret, and asks for forgiveness or patience."}
+  {t:"Business", q:"What are the four body paragraphs of an application letter?", o:["Opening, Second, Third, Closing","Introduction, Body, Conclusion, Signature","Greeting, Main, Request, Thanks","Salutation, Body, Closing, P.S."], c:0,
+   e:"Opening (position + how you learned of it), Second (interest + skills), Third (why best fit + refer to resume), Closing (gratitude + contact details)."}
 ];
 
 /* =========================================================
@@ -775,7 +886,7 @@ function renderCard(){
   cardEl.classList.remove('flipped');
   const c = cardList[cardIndex];
   fcQ.textContent = c.q;
-  fcA.textContent = c.a;
+  fcA.innerHTML = typeof c.a === 'string' ? '<p>' + c.a + '</p>' : c.a;
   fcCounter.textContent = (cardIndex + 1) + ' / ' + cardList.length;
   prevBtn.disabled = cardIndex === 0;
   nextBtn.disabled = cardIndex === cardList.length - 1;
